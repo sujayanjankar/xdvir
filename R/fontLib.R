@@ -4,11 +4,13 @@
 
 FontLibrary <- function(glyphWidth,
                         glyphHeight,
+                        glyphVertAdvance,
                         glyphBounds,
                         ## Glyph integer index from UNICODE
                         glyphIndex) {
     fontLib <- list(glyphWidth=glyphWidth,
                     glyphHeight=glyphHeight,
+                    glyphVertAdvance=glyphVertAdvance,
                     glyphBounds=glyphBounds,
                     glyphIndex=glyphIndex)
     class(fontLib) <- "FontLibrary"
@@ -70,9 +72,17 @@ TeXglyphWidth <- function(index, file, size, fontLib, state) {
 
 TeXglyphHeight <- function(index, file, size, fontLib, state) {
     height <- fontLib$glyphHeight(index, file)
+    # print(height)
     unitsPerEm <- metricUnits(height)
     ## floor() to get whole number of TeX units (scaled points)
     floor(size * height/unitsPerEm)
+}
+
+TeXglyphVertAdvance <- function(index, file, size, fontLib, state) {
+    vertAdvance <- fontLib$glyphVertAdvance(index, file)
+    # print(vertAdvance)
+    unitsPerEm <- metricUnits(vertAdvance)
+    floor(size * vertAdvance/unitsPerEm)
 }
 
 TeXglyphBounds <- function(index, file, size, fontLib, state) {
@@ -106,5 +116,6 @@ nullGlyphIndex <- function(code, file) {
                            
 nullFontLib <- FontLibrary(glyphWidth=nullGlyphWidth,
                            glyphHeight=NULL,
+                           glyphVertAdvance=NULL,
                            glyphBounds=nullGlyphBounds,
                            glyphIndex=nullGlyphIndex)

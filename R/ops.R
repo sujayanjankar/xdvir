@@ -98,20 +98,21 @@ setChar <- function(raw, put=FALSE, state) {
         updateTextRight(h + width[1], state)
     } else {
         height <- TeXglyphHeight(id, font$file, font$size, fontLib, state)
+        vertAdvance <- TeXglyphVertAdvance(id, font$file, font$size, fontLib, state)
         ## Position glyph then move
         x <- h
         xx <- hh
         ## y origin is v + bbox[4] (ymax) + height[2] (tsb)
-        y <- v + bbox[4] + height[2]
+        y <- v + bbox[4] + height
         yy <- vv + round(TeX2px(bbox[4] + height[2], state))
         glyph <- glyph(x, y, xx, yy, id, f, font$size, colour=colour[1])
         updateBBoxHoriz(h + bbox[1], state) ## left
         updateBBoxHoriz(h + bbox[3], state) ## right
         updateBBoxVert(v + bbox[2], state) ## bottom
-        updateBBoxVert(v + bbox[4] + height[2], state) ## top
+        updateBBoxVert(v + bbox[4] + height, state) ## top
         if (!put) {
-            TeXset("vv", vv + round(TeX2px(height[1], state)), state)
-            moveDown(height[1], state)
+            TeXset("vv", vv + round(TeX2px(vertAdvance, state)), state)
+            moveDown(vertAdvance, state)
         }
         updateTextLeft(h, state)
         updateTextRight(h + bbox[2], state)
