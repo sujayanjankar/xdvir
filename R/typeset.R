@@ -70,8 +70,9 @@ latex <- function(file, dir, engine, packages, dviFile, sig=TRUE) {
         ## 2.  Use shQuote() in 'options' above to match internal call
         ##     in latexmk()
         latexmk(file,
-                engine=engine$command,
-                engine_args=options)
+            engine=engine$command,
+            engine_args=options,
+            emulation = engine$emulation)
     } else {
         ## Have to run within try() because tinytex::latexmk() will only
         ## produce .dvi without error if engine="latex" (hard coded)
