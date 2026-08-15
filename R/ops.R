@@ -32,7 +32,7 @@ moveRight <- function(x, state) {
         }
         TeXset("hh", hh, state)
     }
-    TeXset("h", h + x, state)        
+    TeXset("h", h + x, state)
 }
 
 moveDown <- function(x, state) {
@@ -49,7 +49,7 @@ moveDown <- function(x, state) {
         }
         TeXset("vv", vv, state)
     }
-    TeXset("v", v + x, state)        
+    TeXset("v", v + x, state)
 }
 
 ## set_char_i and set_char are VERY similar
@@ -98,21 +98,23 @@ setChar <- function(raw, put=FALSE, state) {
         updateTextRight(h + width[1], state)
     } else {
         height <- TeXglyphHeight(id, font$file, font$size, fontLib, state)
-        vertAdvance <- TeXglyphVertAdvance(id, font$file, font$size, fontLib, state)
+        vertBearingY <- TeXglyphVertBearingY(id, font$file, font$size, fontLib, state)
+        message("vertBearingY: ", vertBearingY)
+        message("height: ", height)
         ## Position glyph then move
         x <- h
         xx <- hh
         ## y origin is v + bbox[4] (ymax) + height[2] (tsb)
-        y <- v + bbox[4] + height
-        yy <- vv + round(TeX2px(bbox[4] + height[2], state))
+        y <- v + vertBearingY
+        yy <- vv + round(TeX2px(vertBearingY, state))
         glyph <- glyph(x, y, xx, yy, id, f, font$size, colour=colour[1])
         updateBBoxHoriz(h + bbox[1], state) ## left
         updateBBoxHoriz(h + bbox[3], state) ## right
         updateBBoxVert(v + bbox[2], state) ## bottom
-        updateBBoxVert(v + bbox[4] + height, state) ## top
+        updateBBoxVert(v + bbox[4], state) ## top
         if (!put) {
-            TeXset("vv", vv + round(TeX2px(vertAdvance, state)), state)
-            moveDown(vertAdvance, state)
+            TeXset("vv", vv + round(TeX2px(height, state)), state)
+            moveDown(height, state)
         }
         updateTextLeft(h, state)
         updateTextRight(h + bbox[2], state)
@@ -399,7 +401,7 @@ op_z <- function(op, state) {
 op_fnt_num <- function(op, state) {
     ## Maintain font number
     ## + 1 for 1-based indexing
-    f <- blockValue(op$blocks$op.opcode) - 171 + 1 
+    f <- blockValue(op$blocks$op.opcode) - 171 + 1
     TeXset("f", f, state)
 }
 
@@ -437,7 +439,7 @@ op_font_def <- function(op, state) {
     ## Create font definition and save it
     fonts <- TeXget("fonts", state)
     fontnum <- blockValue(op$blocks$op.opparams.k) + 1
-    ## Avoid redefining the same font 
+    ## Avoid redefining the same font
     if (is.null(fonts[[fontnum]]) ||
         !(identical_font(op, fonts[[fontnum]]$op))) {
         ## Reduce vector of individual characters to single character value
@@ -452,7 +454,7 @@ op_font_def <- function(op, state) {
                                  size=s*(mag/1000),
                                  variations=attr(fontfile, "variations"),
                                  ## For pixel adjustments
-                                 fontSpace=s %/% 6, 
+                                 fontSpace=s %/% 6,
                                  op=op)
         TeXset("fonts", fonts, state)
     }
@@ -521,7 +523,7 @@ op_x_font_def <- function(op, state) {
     ## Create font definition and save it
     fonts <- TeXget("fonts", state)
     fontnum <- blockValue(op$blocks$op.opparams.fontnum) + 1
-    ## Avoid redefining the same font 
+    ## Avoid redefining the same font
     if (is.null(fonts[[fontnum]]) ||
         !(identical_font(op, fonts[[fontnum]]$op))) {
         fontnameChars <-
@@ -533,7 +535,7 @@ op_x_font_def <- function(op, state) {
                                  index=fontindex,
                                  size=fontsize*(mag/1000),
                                  ## For pixel adjustments
-                                 fontSpace=fontsize %/% 6, 
+                                 fontSpace=fontsize %/% 6,
                                  op=op)
         TeXset("fonts", fonts, state)
     }
@@ -668,7 +670,7 @@ operationNames[253] <- "x_fnt_def"
 operationNames[254] <- "x_glyph"
 operationNames[255] <- "x_glyph_str"
 operationNames[256] <- "dir"
-    
+
 opNames <- function(codes) {
     if (!length(codes) ||
         !all(is.finite(codes)) ||

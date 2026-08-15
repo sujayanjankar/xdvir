@@ -4,13 +4,13 @@
 
 FontLibrary <- function(glyphWidth,
                         glyphHeight,
-                        glyphVertAdvance,
+                        glyphVertBearingY,
                         glyphBounds,
                         ## Glyph integer index from UNICODE
                         glyphIndex) {
     fontLib <- list(glyphWidth=glyphWidth,
                     glyphHeight=glyphHeight,
-                    glyphVertAdvance=glyphVertAdvance,
+                    glyphVertBearingY=glyphVertBearingY,
                     glyphBounds=glyphBounds,
                     glyphIndex=glyphIndex)
     class(fontLib) <- "FontLibrary"
@@ -78,11 +78,10 @@ TeXglyphHeight <- function(index, file, size, fontLib, state) {
     floor(size * height/unitsPerEm)
 }
 
-TeXglyphVertAdvance <- function(index, file, size, fontLib, state) {
-    vertAdvance <- fontLib$glyphVertAdvance(index, file)
-    # print(vertAdvance)
-    unitsPerEm <- metricUnits(vertAdvance)
-    floor(size * vertAdvance/unitsPerEm)
+TeXglyphVertBearingY <- function(index, file, size, fontLib, state) {
+    vertBearingY <- fontLib$glyphVertBearingY(index, file)
+    unitsPerEm <- metricUnits(vertBearingY)
+    floor(size * vertBearingY / unitsPerEm)
 }
 
 TeXglyphBounds <- function(index, file, size, fontLib, state) {
@@ -110,12 +109,12 @@ nullGlyphBounds <- function(index, file) {
 }
 
 nullGlyphIndex <- function(code, file) {
-    ## Just return the character code 
+    ## Just return the character code
     code
 }
-                           
+
 nullFontLib <- FontLibrary(glyphWidth=nullGlyphWidth,
                            glyphHeight=NULL,
-                           glyphVertAdvance=NULL,
+                           glyphVertBearingY=NULL,
                            glyphBounds=nullGlyphBounds,
                            glyphIndex=nullGlyphIndex)
