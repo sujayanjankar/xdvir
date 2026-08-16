@@ -98,9 +98,6 @@ setChar <- function(raw, put=FALSE, state) {
         updateTextRight(h + width[1], state)
     } else {
         height <- TeXglyphHeight(id, font$file, font$size, fontLib, state)
-        # vertBearingY <- TeXglyphVertBearingY(id, font$file, font$size, fontLib, state)
-        # message("vertBearingY: ", vertBearingY)
-        message("height: ", height)
         ## Position glyph then move
         x <- h
         xx <- hh
