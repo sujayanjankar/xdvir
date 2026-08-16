@@ -44,10 +44,6 @@ FTglyphHeight <- function(index, fontName) {
     FTglyphMetrics(index, "height", fontName)
 }
 
-FTglyphVertBearingY <- function(index, fontName) {
-    FTglyphMetrics(index, "vertBearingY", fontName)
-}
-
 FTglyphBounds <- function(index, fontName) {
     FTglyphMetrics(index,
                    c("left", "bottom", "right", "top"),
@@ -60,6 +56,5 @@ FTglyphIndex <- function(code, fontName) {
 
 FTfontLibrary <- FontLibrary(glyphWidth=FTglyphWidth,
                              glyphHeight=FTglyphHeight,
-                             glyphVertBearingY=FTglyphVertBearingY,
                              glyphBounds=FTglyphBounds,
                              glyphIndex=FTglyphIndex)

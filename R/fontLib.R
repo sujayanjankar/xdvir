@@ -4,13 +4,11 @@
 
 FontLibrary <- function(glyphWidth,
                         glyphHeight,
-                        glyphVertBearingY,
                         glyphBounds,
                         ## Glyph integer index from UNICODE
                         glyphIndex) {
     fontLib <- list(glyphWidth=glyphWidth,
                     glyphHeight=glyphHeight,
-                    glyphVertBearingY=glyphVertBearingY,
                     glyphBounds=glyphBounds,
                     glyphIndex=glyphIndex)
     class(fontLib) <- "FontLibrary"
@@ -78,12 +76,6 @@ TeXglyphHeight <- function(index, file, size, fontLib, state) {
     floor(size * height/unitsPerEm)
 }
 
-TeXglyphVertBearingY <- function(index, file, size, fontLib, state) {
-    vertBearingY <- fontLib$glyphVertBearingY(index, file)
-    unitsPerEm <- metricUnits(vertBearingY)
-    floor(size * vertBearingY / unitsPerEm)
-}
-
 TeXglyphBounds <- function(index, file, size, fontLib, state) {
     bounds <- fontLib$glyphBounds(index, file)
     unitsPerEm <- metricUnits(bounds)
@@ -101,6 +93,13 @@ nullGlyphWidth <- function(index, file) {
     w
 }
 
+nullGlyphHeight <- function(index, file) {
+    ## Fixed advance height
+    h <- 500
+    attr(w, "unitsPerEm") <- 1000
+    h
+}
+
 nullGlyphBounds <- function(index, file) {
     ## Fixed width and fixed height
     bbox <- c(0, 0, 400, 700)
@@ -114,7 +113,6 @@ nullGlyphIndex <- function(code, file) {
 }
 
 nullFontLib <- FontLibrary(glyphWidth=nullGlyphWidth,
-                           glyphHeight=NULL,
-                           glyphVertBearingY=NULL,
+                           glyphHeight=nullGlyphHeight,
                            glyphBounds=nullGlyphBounds,
                            glyphIndex=nullGlyphIndex)
