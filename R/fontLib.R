@@ -70,7 +70,6 @@ TeXglyphWidth <- function(index, file, size, fontLib, state) {
 
 TeXglyphHeight <- function(index, file, size, fontLib, state) {
     height <- fontLib$glyphHeight(index, file)
-    # print(height)
     unitsPerEm <- metricUnits(height)
     ## floor() to get whole number of TeX units (scaled points)
     floor(size * height/unitsPerEm)

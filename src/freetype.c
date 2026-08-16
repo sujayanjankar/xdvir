@@ -39,7 +39,7 @@ SEXP glyphMetrics(SEXP font) {
     PROTECT(metrics = allocVector(VECSXP, numGlyphs));
     glyphErr = 0;
     for (i=0; i < numGlyphs; i++) {
-        PROTECT(glyphInfo = allocVector(INTSXP, 7));
+        PROTECT(glyphInfo = allocVector(INTSXP, 6));
         err = FT_Load_Glyph(face, i, FT_LOAD_NO_SCALE);
         if (err) {
             glyphErr = 1;
@@ -49,7 +49,6 @@ SEXP glyphMetrics(SEXP font) {
             INTEGER(glyphInfo)[3] = NA_INTEGER;
             INTEGER(glyphInfo)[4] = NA_INTEGER;
             INTEGER(glyphInfo)[5] = NA_INTEGER;
-            INTEGER(glyphInfo)[6] = NA_INTEGER;
         } else {
             INTEGER(glyphInfo)[0] = face->glyph->metrics.horiAdvance;
             INTEGER(glyphInfo)[1] = face->glyph->metrics.horiBearingX;
@@ -59,7 +58,6 @@ SEXP glyphMetrics(SEXP font) {
             INTEGER(glyphInfo)[4] = face->glyph->metrics.horiBearingY -
                 face->glyph->metrics.height;
             INTEGER(glyphInfo)[5] = face->glyph->metrics.vertAdvance;
-            INTEGER(glyphInfo)[6] = face->glyph->metrics.vertBearingY;
         }
         SET_VECTOR_ELT(metrics, i, glyphInfo);
         UNPROTECT(1);

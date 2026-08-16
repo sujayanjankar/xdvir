@@ -8,7 +8,7 @@ addFont <- function(fontName) {
                            function(x) {
                                names(x) <- c("width",
                                              "left", "right", "top", "bottom",
-                                             "height", "vertBearingY")
+                                             "height")
                                x
                            })
     cache <- get("FTcache")
