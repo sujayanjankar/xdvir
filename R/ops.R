@@ -98,15 +98,15 @@ setChar <- function(raw, put=FALSE, state) {
         updateTextRight(h + width[1], state)
     } else {
         height <- TeXglyphHeight(id, font$file, font$size, fontLib, state)
-        vertBearingY <- TeXglyphVertBearingY(id, font$file, font$size, fontLib, state)
-        message("vertBearingY: ", vertBearingY)
+        # vertBearingY <- TeXglyphVertBearingY(id, font$file, font$size, fontLib, state)
+        # message("vertBearingY: ", vertBearingY)
         message("height: ", height)
         ## Position glyph then move
         x <- h
         xx <- hh
         ## y origin is v + bbox[4] (ymax) + height[2] (tsb)
-        y <- v + vertBearingY
-        yy <- vv + round(TeX2px(vertBearingY, state))
+        y <- v # + vertBearingY
+        yy <- vv # + round(TeX2px(vertBearingY, state))
         glyph <- glyph(x, y, xx, yy, id, f, font$size, colour=colour[1])
         updateBBoxHoriz(h + bbox[1], state) ## left
         updateBBoxHoriz(h + bbox[3], state) ## right
