@@ -48,7 +48,7 @@ export("readDVI",
 
        "grid.latex", "latexGrob",
 
-       "commentString",
+       "commentString", "buildSignature",
 
        "grid.lualatex", "lualatexGrob",
        "grid.xelatex", "xelatexGrob",
