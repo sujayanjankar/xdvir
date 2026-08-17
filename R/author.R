@@ -116,7 +116,8 @@ preset <- function(family, face, size, lineheight, colour) {
 author <- function(tex,
                    width=NA,
                    engine=getOption("xdvir.engine"),
-                   packages=NULL) {
+                   packages=NULL,
+                   document_class=NULL) {
     if (!is.character(tex))
         stop("'tex' should be a character value containing a LaTeX fragment")
     if (length(tex) < 1)
@@ -144,7 +145,11 @@ author <- function(tex,
     }
     texDoc <- c(## Record engine used for authoring
                 comment(engine, pkgNames),
-                paste0("\\documentclass[", varwidth, "]{standalone}"),
+                paste0(
+                    "\\documentclass[", varwidth, "]{",
+                    ifelse(length(document_class) > 0, document_class, "standalone"),
+                    "}"
+                ),
                 engine$preamble,
                 packagePreamble(pkgs),
                 "\\begin{document}",
