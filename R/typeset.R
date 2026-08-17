@@ -56,11 +56,12 @@ latex <- function(file, dir, engine, packages, dviFile, sig=TRUE) {
         sig <- buildSignature(engine, packages)
         options <- c(engine$options,
                      paste0('--output-comment="', sig, '"'),
-                     shQuote(paste0("--output-directory=", dir)))
+                     shQuote(paste0("-output-directory=", dir)))
     } else {
         options <- c(engine$options,
-                     shQuote(paste0("--output-directory=", dir)))
+                     shQuote(paste0("-output-directory=", dir)))
     }
+    message(options)
     oodir <- getOption("tinytex.output_dir")
     on.exit(options(tinytex.output_dir=oodir))
     options(tinytex.output_dir=dir)
