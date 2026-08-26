@@ -102,17 +102,16 @@ setChar <- function(raw, put=FALSE, state) {
         xx <- hh
         y <- v
         yy <- vv
+        # Potential hack rotation: rotation = ifelse(id == 27, -1.57, 0)
         glyph <- glyph(x, y, xx, yy, id, f, font$size, colour=colour[1])
         updateBBoxHoriz(h + bbox[1], state) ## left
         updateBBoxHoriz(h + bbox[3], state) ## right
-        updateBBoxVert(v + bbox[2], state) ## bottom
-        updateBBoxVert(v + bbox[4], state) ## top
+        updateBBoxVert(v - bbox[2], state) ## bottom
+        updateBBoxVert(v - bbox[4], state) ## top
         if (!put) {
             TeXset("vv", vv + round(TeX2px(height, state)), state)
             moveDown(height, state)
         }
-        updateTextLeft(h, state)
-        updateTextRight(h + bbox[2], state)
     }
     addGlyph(glyph, state)
 }
@@ -277,7 +276,8 @@ op_right <- function(op, state) {
         moveRight(b, state)
     } else {
         vSpace(b, state)
-        moveDown(b, state)
+        # Don't need to move down on a right shift.
+        # moveDown(b, state)
     }
 }
 
@@ -341,7 +341,8 @@ op_down <- function(op, state) {
         moveDown(a, state)
     } else {
         hSpace(-a, state)
-        moveRight(-a, state)
+        # Don't need to move down on a right shift.
+        # moveRight(-a, state)
     }
 }
 
