@@ -2,6 +2,8 @@
 ## Functions for sweeping through operations within DVI file
 
 op_ignore <- function(op, state) { }
+degrees <- -90
+radians <- degrees * (pi / 180)
 
 ## Glyph index from raw bytes
 glyphIndex <- function(raw, filename, fontLib) {
@@ -97,20 +99,24 @@ setChar <- function(raw, put=FALSE, state) {
         updateTextLeft(h, state)
         updateTextRight(h + width[1], state)
     } else {
+        width <- TeXglyphWidth(id, font$file, font$size, fontLib, state)
         height <- TeXglyphHeight(id, font$file, font$size, fontLib, state)
+        # TODO: This is horrible and needs to be done in a better way.
+        isLatin <- id < 256
         x <- h
         xx <- hh
         y <- v
         yy <- vv
-        # Potential hack rotation: rotation = ifelse(id == 27, -1.57, 0)
-        glyph <- glyph(x, y, xx, yy, id, f, font$size, colour=colour[1])
+        glyph <- glyph(x, y, xx, yy, id, f, font$size, colour=colour[1],
+            rotation = ifelse(isLatin, radians, 0))
         updateBBoxHoriz(h + bbox[1], state) ## left
         updateBBoxHoriz(h + bbox[3], state) ## right
         updateBBoxVert(v - bbox[2], state) ## bottom
         updateBBoxVert(v - bbox[4], state) ## top
         if (!put) {
-            TeXset("vv", vv + round(TeX2px(height, state)), state)
-            moveDown(height, state)
+            move_by <- ifelse(isLatin, width[1], height)
+            TeXset("vv", vv + round(TeX2px(move_by, state)), state)
+            moveDown(move_by, state)
         }
     }
     addGlyph(glyph, state)
@@ -299,6 +305,7 @@ op_w <- function(op, state) {
         hSpace(w, state)
         moveRight(w, state)
     } else {
+        # vspace doesn't seem to make a difference to the output.
         vSpace(w, state)
         moveDown(w, state)
     }
@@ -340,8 +347,9 @@ op_down <- function(op, state) {
         vSpace(a, state)
         moveDown(a, state)
     } else {
+        # hSpace doesn't seem to be doing anything.
         hSpace(-a, state)
-        # Don't need to move down on a right shift.
+        # Don't need to move right when moving down.
         # moveRight(-a, state)
     }
 }
@@ -431,6 +439,7 @@ op_special <- function(op, state) {
 op_font_def <- function(op, state) {
     mag <- TeXget("mag", state)
     engine <- TeXget("engine", state)
+    # Doesn't seem to be used.
     fontLib <- TeXget("fontLib", state)
     ## Create font definition and save it
     fonts <- TeXget("fonts", state)
