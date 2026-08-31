@@ -7,8 +7,7 @@ addFont <- function(fontName) {
     font$metrics <- lapply(font$metrics,
                            function(x) {
                                names(x) <- c("width",
-                                             "left", "right", "top", "bottom",
-                                             "height")
+                                             "left", "right", "top", "bottom")
                                x
                            })
     cache <- get("FTcache")
@@ -40,10 +39,6 @@ FTglyphWidth <- function(index, fontName) {
     FTglyphMetrics(index, "width", fontName)
 }
 
-FTglyphHeight <- function(index, fontName) {
-    FTglyphMetrics(index, "height", fontName)
-}
-
 FTglyphBounds <- function(index, fontName) {
     FTglyphMetrics(index,
                    c("left", "bottom", "right", "top"),
@@ -55,6 +50,6 @@ FTglyphIndex <- function(code, fontName) {
 }
 
 FTfontLibrary <- FontLibrary(glyphWidth=FTglyphWidth,
-                             glyphHeight=FTglyphHeight,
+                             glyphHeight=NULL,
                              glyphBounds=FTglyphBounds,
                              glyphIndex=FTglyphIndex)

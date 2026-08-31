@@ -92,13 +92,6 @@ nullGlyphWidth <- function(index, file) {
     w
 }
 
-nullGlyphHeight <- function(index, file) {
-    ## Fixed advance height
-    h <- 500
-    attr(w, "unitsPerEm") <- 1000
-    h
-}
-
 nullGlyphBounds <- function(index, file) {
     ## Fixed width and fixed height
     bbox <- c(0, 0, 400, 700)
@@ -107,11 +100,11 @@ nullGlyphBounds <- function(index, file) {
 }
 
 nullGlyphIndex <- function(code, file) {
-    ## Just return the character code
+    ## Just return the character code 
     code
 }
-
+                           
 nullFontLib <- FontLibrary(glyphWidth=nullGlyphWidth,
-                           glyphHeight=nullGlyphHeight,
+                           glyphHeight=NULL,
                            glyphBounds=nullGlyphBounds,
                            glyphIndex=nullGlyphIndex)

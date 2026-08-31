@@ -3,7 +3,7 @@
 
 SEXP glyphMetrics(SEXP font) {
     FT_Library  ft_library;
-    FT_Face     face;
+    FT_Face     face; 
     long        numGlyphs;
     int         i, glyphErr, err;
 
@@ -23,7 +23,7 @@ SEXP glyphMetrics(SEXP font) {
         error("Font read failed: Unknown font format");
     } else if (err) {
         error("Font read failed (%s)", CHAR(STRING_ELT(font, 0)));
-    }
+    } 
 
     err = FT_Set_Char_Size(face, 0, 12*64, 96, 0);
     if (err) {
@@ -39,7 +39,7 @@ SEXP glyphMetrics(SEXP font) {
     PROTECT(metrics = allocVector(VECSXP, numGlyphs));
     glyphErr = 0;
     for (i=0; i < numGlyphs; i++) {
-        PROTECT(glyphInfo = allocVector(INTSXP, 6));
+        PROTECT(glyphInfo = allocVector(INTSXP, 5));
         err = FT_Load_Glyph(face, i, FT_LOAD_NO_SCALE);
         if (err) {
             glyphErr = 1;
@@ -48,16 +48,14 @@ SEXP glyphMetrics(SEXP font) {
             INTEGER(glyphInfo)[2] = NA_INTEGER;
             INTEGER(glyphInfo)[3] = NA_INTEGER;
             INTEGER(glyphInfo)[4] = NA_INTEGER;
-            INTEGER(glyphInfo)[5] = NA_INTEGER;
         } else {
             INTEGER(glyphInfo)[0] = face->glyph->metrics.horiAdvance;
             INTEGER(glyphInfo)[1] = face->glyph->metrics.horiBearingX;
-            INTEGER(glyphInfo)[2] = face->glyph->metrics.horiBearingX +
+            INTEGER(glyphInfo)[2] = face->glyph->metrics.horiBearingX + 
                 face->glyph->metrics.width;
             INTEGER(glyphInfo)[3] = face->glyph->metrics.horiBearingY;
-            INTEGER(glyphInfo)[4] = face->glyph->metrics.horiBearingY -
+            INTEGER(glyphInfo)[4] = face->glyph->metrics.horiBearingY - 
                 face->glyph->metrics.height;
-            INTEGER(glyphInfo)[5] = face->glyph->metrics.vertAdvance;
         }
         SET_VECTOR_ELT(metrics, i, glyphInfo);
         UNPROTECT(1);
@@ -85,7 +83,7 @@ SEXP glyphMetrics(SEXP font) {
 
 SEXP glyphIndex(SEXP code, SEXP font) {
     FT_Library ft_library;
-    FT_Face face;
+    FT_Face face; 
     int index, err;
     SEXP result = R_NilValue;
 
@@ -94,7 +92,7 @@ SEXP glyphIndex(SEXP code, SEXP font) {
     err = FT_Init_FreeType(&ft_library);
     if (err) {
         error("FreeType initialisation failed");
-    }
+    } 
 
     err = FT_New_Face(ft_library,
                       CHAR(STRING_ELT(font, 0)),
@@ -104,17 +102,17 @@ SEXP glyphIndex(SEXP code, SEXP font) {
         error("Font read failed: Unknown font format");
     } else if (err) {
         error("Font read failed");
-    }
+    } 
 
     err = FT_Select_Charmap(face, FT_ENCODING_UNICODE);
     if (err) {
         error("Failed to select UNICODE charmap");
-    }
+    } 
 
     index = FT_Get_Char_Index(face, INTEGER(code)[0]);
     if (!index) {
         error("Undefined character code");
-    }
+    } 
     INTEGER(result)[0] = index;
 
     err = FT_Done_Face(face);
