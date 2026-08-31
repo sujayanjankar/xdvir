@@ -12,7 +12,8 @@ TeXengine <- function(name,
                       options=NULL,
                       preamble="",
                       dviSuffix=".dvi",
-                      emulation = TRUE) {
+                      emulation = TRUE,
+                      buildArgs = NULL) {
     engine <- list(name=name,
                    version=version,
                    command=command,
@@ -22,7 +23,8 @@ TeXengine <- function(name,
                    options=options,
                    preamble=preamble,
                    dviSuffix=dviSuffix,
-                   emulation=emulation)
+                   emulation=emulation,
+                   buildArgs=buildArgs)
     class(engine) <- "TeXengine"
     engine
 }
