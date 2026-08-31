@@ -56,7 +56,7 @@ moveDown <- function(x, state) {
 
 ## set_char_i and set_char are VERY similar
 ## (put_char_i is also VERY similar - just does not adjust (h, v)
-setChar <- function(raw, put=FALSE, state) {
+setChar <- function(raw, put=FALSE, state, eightBit=FALSE) {
     if (tikzTransform(state)) {
         setTransformedChar(raw, put=FALSE, state)
         return()
@@ -101,11 +101,13 @@ setChar <- function(raw, put=FALSE, state) {
     } else {
         width <- TeXglyphWidth(id, font$file, font$size, fontLib, state)
         height <- TeXglyphHeight(id, font$file, font$size, fontLib, state)
-        # TODO: This is horrible and needs to be done in a better way.
-        isLatin <- id < 256
+        # TODO: This is horrible (?) and needs to be done in a better way.
+        isLatin <- eightBit
+        bb_width <- bbox[3] - bbox[1] # (right - left)
+        adjusted_v <-  v - bb_width - width / 2
         x <- h
         xx <- hh
-        y <- v
+        y <- ifelse(isLatin, adjusted_v, v)
         yy <- vv
         glyph <- glyph(x, y, xx, yy, id, f, font$size, colour=colour[1],
             rotation = ifelse(isLatin, radians, 0))
@@ -125,7 +127,7 @@ setChar <- function(raw, put=FALSE, state) {
 ## 0..127
 ## set_char_<i>
 op_set_char <- function(op, state) {
-    setChar(op$blocks$op.opcode$fileRaw, put=FALSE, state)
+    setChar(op$blocks$op.opcode$fileRaw, put=FALSE, state, eightBit=TRUE)
 }
 
 ## 128..131
