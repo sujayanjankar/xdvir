@@ -103,11 +103,9 @@ setChar <- function(raw, put=FALSE, state, eightBit=FALSE) {
         height <- TeXglyphHeight(id, font$file, font$size, fontLib, state)
         # TODO: This is horrible (?) and needs to be done in a better way.
         isLatin <- eightBit
-        bb_width <- bbox[3] - bbox[1] # (right - left)
-        adjusted_v <-  v - bb_width - width / 2
         x <- h
         xx <- hh
-        y <- ifelse(isLatin, adjusted_v, v)
+        y <- ifelse(isLatin, (v - width), v)
         yy <- vv
         glyph <- glyph(x, y, xx, yy, id, f, font$size, colour=colour[1],
             rotation = ifelse(isLatin, radians, 0))
@@ -375,7 +373,8 @@ op_y <- function(op, state) {
         moveDown(y, state)
     } else {
         hSpace(-y, state)
-        moveRight(-y, state)
+        # Don't need to move right on a y-move.
+        # moveRight(-y, state)
     }
 }
 
