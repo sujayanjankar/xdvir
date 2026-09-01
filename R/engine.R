@@ -11,7 +11,9 @@ TeXengine <- function(name,
                       glyphIndex,
                       options=NULL,
                       preamble="",
-                      dviSuffix=".dvi") {
+                      dviSuffix=".dvi",
+                      emulation = TRUE,
+                      buildArgs = NULL) {
     engine <- list(name=name,
                    version=version,
                    command=command,
@@ -20,7 +22,9 @@ TeXengine <- function(name,
                    glyphIndex=glyphIndex,
                    options=options,
                    preamble=preamble,
-                   dviSuffix=dviSuffix)
+                   dviSuffix=dviSuffix,
+                   emulation=emulation,
+                   buildArgs=buildArgs)
     class(engine) <- "TeXengine"
     engine
 }

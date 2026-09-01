@@ -2,6 +2,8 @@
 ## Functions for sweeping through operations within DVI file
 
 op_ignore <- function(op, state) { }
+degrees <- -90
+radians <- degrees * (pi / 180)
 
 ## Glyph index from raw bytes
 glyphIndex <- function(raw, filename, fontLib) {
@@ -32,7 +34,7 @@ moveRight <- function(x, state) {
         }
         TeXset("hh", hh, state)
     }
-    TeXset("h", h + x, state)        
+    TeXset("h", h + x, state)
 }
 
 moveDown <- function(x, state) {
@@ -49,12 +51,12 @@ moveDown <- function(x, state) {
         }
         TeXset("vv", vv, state)
     }
-    TeXset("v", v + x, state)        
+    TeXset("v", v + x, state)
 }
 
 ## set_char_i and set_char are VERY similar
 ## (put_char_i is also VERY similar - just does not adjust (h, v)
-setChar <- function(raw, put=FALSE, state) {
+setChar <- function(raw, put=FALSE, state, eightBit=FALSE) {
     if (tikzTransform(state)) {
         setTransformedChar(raw, put=FALSE, state)
         return()
@@ -97,24 +99,25 @@ setChar <- function(raw, put=FALSE, state) {
         updateTextLeft(h, state)
         updateTextRight(h + width[1], state)
     } else {
+        width <- TeXglyphWidth(id, font$file, font$size, fontLib, state)
         height <- TeXglyphHeight(id, font$file, font$size, fontLib, state)
-        ## Position glyph then move
+        # TODO: This is horrible (?) and needs to be done in a better way.
+        isLatin <- eightBit
         x <- h
         xx <- hh
-        ## y origin is v + bbox[4] (ymax) + height[2] (tsb)
-        y <- v + bbox[4] + height[2]
-        yy <- vv + round(TeX2px(bbox[4] + height[2], state))
-        glyph <- glyph(x, y, xx, yy, id, f, font$size, colour=colour[1])
+        y <- ifelse(isLatin, (v - width), v)
+        yy <- vv
+        glyph <- glyph(x, y, xx, yy, id, f, font$size, colour=colour[1],
+            rotation = ifelse(isLatin, radians, 0))
         updateBBoxHoriz(h + bbox[1], state) ## left
         updateBBoxHoriz(h + bbox[3], state) ## right
-        updateBBoxVert(v + bbox[2], state) ## bottom
-        updateBBoxVert(v + bbox[4] + height[2], state) ## top
+        updateBBoxVert(v - bbox[2], state) ## bottom
+        updateBBoxVert(v - bbox[4], state) ## top
         if (!put) {
-            TeXset("vv", vv + round(TeX2px(height[1], state)), state)
-            moveDown(height[1], state)
+            move_by <- ifelse(isLatin, width[1], height)
+            TeXset("vv", vv + round(TeX2px(move_by, state)), state)
+            moveDown(move_by, state)
         }
-        updateTextLeft(h, state)
-        updateTextRight(h + bbox[2], state)
     }
     addGlyph(glyph, state)
 }
@@ -122,7 +125,7 @@ setChar <- function(raw, put=FALSE, state) {
 ## 0..127
 ## set_char_<i>
 op_set_char <- function(op, state) {
-    setChar(op$blocks$op.opcode$fileRaw, put=FALSE, state)
+    setChar(op$blocks$op.opcode$fileRaw, put=FALSE, state, eightBit=TRUE)
 }
 
 ## 128..131
@@ -279,7 +282,8 @@ op_right <- function(op, state) {
         moveRight(b, state)
     } else {
         vSpace(b, state)
-        moveDown(b, state)
+        # Don't need to move down on a right shift.
+        # moveDown(b, state)
     }
 }
 
@@ -301,6 +305,7 @@ op_w <- function(op, state) {
         hSpace(w, state)
         moveRight(w, state)
     } else {
+        # vspace doesn't seem to make a difference to the output.
         vSpace(w, state)
         moveDown(w, state)
     }
@@ -342,8 +347,10 @@ op_down <- function(op, state) {
         vSpace(a, state)
         moveDown(a, state)
     } else {
+        # hSpace doesn't seem to be doing anything.
         hSpace(-a, state)
-        moveRight(-a, state)
+        # Don't need to move right when moving down.
+        # moveRight(-a, state)
     }
 }
 
@@ -366,7 +373,8 @@ op_y <- function(op, state) {
         moveDown(y, state)
     } else {
         hSpace(-y, state)
-        moveRight(-y, state)
+        # Don't need to move right on a y-move.
+        # moveRight(-y, state)
     }
 }
 
@@ -398,7 +406,7 @@ op_z <- function(op, state) {
 op_fnt_num <- function(op, state) {
     ## Maintain font number
     ## + 1 for 1-based indexing
-    f <- blockValue(op$blocks$op.opcode) - 171 + 1 
+    f <- blockValue(op$blocks$op.opcode) - 171 + 1
     TeXset("f", f, state)
 }
 
@@ -432,11 +440,12 @@ op_special <- function(op, state) {
 op_font_def <- function(op, state) {
     mag <- TeXget("mag", state)
     engine <- TeXget("engine", state)
+    # Doesn't seem to be used.
     fontLib <- TeXget("fontLib", state)
     ## Create font definition and save it
     fonts <- TeXget("fonts", state)
     fontnum <- blockValue(op$blocks$op.opparams.k) + 1
-    ## Avoid redefining the same font 
+    ## Avoid redefining the same font
     if (is.null(fonts[[fontnum]]) ||
         !(identical_font(op, fonts[[fontnum]]$op))) {
         ## Reduce vector of individual characters to single character value
@@ -451,7 +460,7 @@ op_font_def <- function(op, state) {
                                  size=s*(mag/1000),
                                  variations=attr(fontfile, "variations"),
                                  ## For pixel adjustments
-                                 fontSpace=s %/% 6, 
+                                 fontSpace=s %/% 6,
                                  op=op)
         TeXset("fonts", fonts, state)
     }
@@ -520,7 +529,7 @@ op_x_font_def <- function(op, state) {
     ## Create font definition and save it
     fonts <- TeXget("fonts", state)
     fontnum <- blockValue(op$blocks$op.opparams.fontnum) + 1
-    ## Avoid redefining the same font 
+    ## Avoid redefining the same font
     if (is.null(fonts[[fontnum]]) ||
         !(identical_font(op, fonts[[fontnum]]$op))) {
         fontnameChars <-
@@ -532,7 +541,7 @@ op_x_font_def <- function(op, state) {
                                  index=fontindex,
                                  size=fontsize*(mag/1000),
                                  ## For pixel adjustments
-                                 fontSpace=fontsize %/% 6, 
+                                 fontSpace=fontsize %/% 6,
                                  op=op)
         TeXset("fonts", fonts, state)
     }
@@ -667,7 +676,7 @@ operationNames[253] <- "x_fnt_def"
 operationNames[254] <- "x_glyph"
 operationNames[255] <- "x_glyph_str"
 operationNames[256] <- "dir"
-    
+
 opNames <- function(codes) {
     if (!length(codes) ||
         !all(is.finite(codes)) ||

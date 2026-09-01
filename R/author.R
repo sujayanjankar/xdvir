@@ -64,14 +64,14 @@ mainfont <- function(fontSet, dir, local) {
 
 preset <- function(family, face, size, lineheight, colour) {
     packages <- list("fontspec")
-    
+
     if (is.null(family))
         stop("No font family specified")
     defaultFonts <- !nchar(family) | family %in% c("sans", "serif", "mono")
     if (any(defaultFonts)) {
         family[defaultFonts] <- currentFamily(family)
     }
-    fontSets <- lapply(family, 
+    fontSets <- lapply(family,
                        function(f) {
                            systemfonts::match_fonts(f,
                                                     c(FALSE, FALSE,
@@ -83,19 +83,19 @@ preset <- function(family, face, size, lineheight, colour) {
     dirs <- sapply(fontSets, function(x) dirname(x$path[1]))
     local <- dirs == "."
     fontfamily <- mapply(mainfont, fontSets, dirs, local)
-    
+
     if (is.null(face))
         stop("No font face specified")
     faces <- TeXfaces[match(face, c("plain", "bold", "italic", "bold-italic"))]
     fontface <- ifelse(nchar(faces), paste0(faces, "\n"), "")
-    
+
     if (is.null(size))
         stop("No font size specified")
     if (is.null(lineheight))
         stop("No line height specified")
     fontsize <- paste0("\\fontsize{", size, "}{", size * lineheight, "}\n",
                        "\\selectfont{}\n")
-    
+
     if (is.null(colour))
         stop("No colour specified")
     rgb <- col2rgb(colour)
@@ -107,7 +107,7 @@ preset <- function(family, face, size, lineheight, colour) {
     if (any(!black)) {
         packages <- c(packages, list("xcolor"))
     }
-    
+
     tex <- paste(fontfamily, fontsize, fontface, col, sep="")
     attr(tex, "packages") <- packages
     tex
@@ -116,7 +116,8 @@ preset <- function(family, face, size, lineheight, colour) {
 author <- function(tex,
                    width=NA,
                    engine=getOption("xdvir.engine"),
-                   packages=NULL) {
+                   packages=NULL,
+                   documentClass=NULL) {
     if (!is.character(tex))
         stop("'tex' should be a character value containing a LaTeX fragment")
     if (length(tex) < 1)
@@ -144,7 +145,11 @@ author <- function(tex,
     }
     texDoc <- c(## Record engine used for authoring
                 comment(engine, pkgNames),
-                paste0("\\documentclass[", varwidth, "]{standalone}"),
+                paste0(
+                    "\\documentclass[", varwidth, "]{",
+                    ifelse(length(documentClass) > 0, documentClass, "standalone"),
+                    "}"
+                ),
                 engine$preamble,
                 packagePreamble(pkgs),
                 "\\begin{document}",

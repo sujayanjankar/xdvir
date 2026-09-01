@@ -50,16 +50,21 @@ latex <- function(file, dir, engine, packages, dviFile, sig=TRUE) {
         stop(paste0("The ", engine$name,
                     " engine does not support typesetting"))
     }
-    ## xelatex on Windows (MiKTeX) does not have --output-comment option
-    if (sig &&
-        !(engine$command == "xelatex" && .Platform$OS.type == "windows")) {
-        sig <- buildSignature(engine, packages)
-        options <- c(engine$options,
-                     paste0('--output-comment="', sig, '"'),
-                     shQuote(paste0("--output-directory=", dir)))
+    if(!is.null(engine$buildArgs)) {
+        # Used in upLaTeX
+        options <- engine$buildArgs(buildSignature(engine, packages), dir)
     } else {
-        options <- c(engine$options,
-                     shQuote(paste0("--output-directory=", dir)))
+        ## xelatex on Windows (MiKTeX) does not have --output-comment option
+        if (sig &&
+            !(engine$command == "xelatex" && .Platform$OS.type == "windows")) {
+            sig <- buildSignature(engine, packages)
+            options <- c(engine$options,
+                        paste0('--output-comment="', sig, '"'),
+                        shQuote(paste0("--output-directory=", dir)))
+        } else {
+            options <- c(engine$options,
+                        shQuote(paste0("--output-directory=", dir)))
+        }
     }
     oodir <- getOption("tinytex.output_dir")
     on.exit(options(tinytex.output_dir=oodir))
@@ -70,8 +75,9 @@ latex <- function(file, dir, engine, packages, dviFile, sig=TRUE) {
         ## 2.  Use shQuote() in 'options' above to match internal call
         ##     in latexmk()
         latexmk(file,
-                engine=engine$command,
-                engine_args=options)
+            engine=engine$command,
+            engine_args=options,
+            emulation = engine$emulation)
     } else {
         ## Have to run within try() because tinytex::latexmk() will only
         ## produce .dvi without error if engine="latex" (hard coded)
