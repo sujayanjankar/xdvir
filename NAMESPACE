@@ -38,6 +38,8 @@ export("readDVI",
 
        "TeXengine", "registerEngine",
 
+       "SCRIPT_TYPE_CJK", "SCRIPT_TYPE_LATIN", "SUPPORTED_SCRIPT_TYPES",
+
        "LaTeXpackage", "registerPackage",
        "fontspecPackage", "xcolorPackage", "previewPackage",
        "tikzPackage", "tikzPicture",

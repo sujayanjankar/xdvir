@@ -2,8 +2,13 @@
 ## Functions for sweeping through operations within DVI file
 
 op_ignore <- function(op, state) { }
-degrees <- -90
-radians <- degrees * (pi / 180)
+rotation_degrees <- -90
+rotation_radians <- rotation_degrees * (pi / 180)
+
+## Script types
+SCRIPT_TYPE_CJK <- "CJK"
+SCRIPT_TYPE_LATIN <- "LATIN"
+SUPPORTED_SCRIPT_TYPES <- c(SCRIPT_TYPE_CJK, SCRIPT_TYPE_LATIN)
 
 ## Glyph index from raw bytes
 glyphIndex <- function(raw, filename, fontLib) {
@@ -56,7 +61,7 @@ moveDown <- function(x, state) {
 
 ## set_char_i and set_char are VERY similar
 ## (put_char_i is also VERY similar - just does not adjust (h, v)
-setChar <- function(raw, put=FALSE, state, eightBit=FALSE) {
+setChar <- function(raw, put=FALSE, state) {
     if (tikzTransform(state)) {
         setTransformedChar(raw, put=FALSE, state)
         return()
@@ -101,14 +106,13 @@ setChar <- function(raw, put=FALSE, state, eightBit=FALSE) {
     } else {
         width <- TeXglyphWidth(id, font$file, font$size, fontLib, state)
         height <- TeXglyphHeight(id, font$file, font$size, fontLib, state)
-        # TODO: This is horrible (?) and needs to be done in a better way.
-        isLatin <- eightBit
+        isLatin <- font$scriptType == SCRIPT_TYPE_LATIN
         x <- h
         xx <- hh
         y <- ifelse(isLatin, (v - width), v)
         yy <- vv
         glyph <- glyph(x, y, xx, yy, id, f, font$size, colour=colour[1],
-            rotation = ifelse(isLatin, radians, 0))
+            rotation = ifelse(isLatin, rotation_radians, 0))
         updateBBoxHoriz(h + bbox[1], state) ## left
         updateBBoxHoriz(h + bbox[3], state) ## right
         updateBBoxVert(v - bbox[2], state) ## bottom
@@ -125,7 +129,7 @@ setChar <- function(raw, put=FALSE, state, eightBit=FALSE) {
 ## 0..127
 ## set_char_<i>
 op_set_char <- function(op, state) {
-    setChar(op$blocks$op.opcode$fileRaw, put=FALSE, state, eightBit=TRUE)
+    setChar(op$blocks$op.opcode$fileRaw, put=FALSE, state)
 }
 
 ## 128..131
@@ -305,7 +309,6 @@ op_w <- function(op, state) {
         hSpace(w, state)
         moveRight(w, state)
     } else {
-        # vspace doesn't seem to make a difference to the output.
         vSpace(w, state)
         moveDown(w, state)
     }
@@ -347,7 +350,6 @@ op_down <- function(op, state) {
         vSpace(a, state)
         moveDown(a, state)
     } else {
-        # hSpace doesn't seem to be doing anything.
         hSpace(-a, state)
         # Don't need to move right when moving down.
         # moveRight(-a, state)
@@ -440,7 +442,6 @@ op_special <- function(op, state) {
 op_font_def <- function(op, state) {
     mag <- TeXget("mag", state)
     engine <- TeXget("engine", state)
-    # Doesn't seem to be used.
     fontLib <- TeXget("fontLib", state)
     ## Create font definition and save it
     fonts <- TeXget("fonts", state)
@@ -452,6 +453,22 @@ op_font_def <- function(op, state) {
         fontname <- paste(blockValue(op$blocks$op.opparams.fontname.name),
                           collapse="")
         fontfile <- engine$fontFile(fontname)
+        scriptType <- match.arg(
+            # Assumes Latin script if the resolution function is not defined.
+            # TODO: Should be documented.
+            ifelse(
+                is.null(fontLib$resolveScriptType),
+                SCRIPT_TYPE_LATIN,
+                fontLib$resolveScriptType(fontname)
+            ),
+            SUPPORTED_SCRIPT_TYPES
+        )
+        if (is.null(scriptType)) {
+            stop(
+                "Only these script types are supported: ",
+                paste(SUPPORTED_SCRIPT_TYPES, collapse = ", ")
+            )
+        }
         s <- blockValue(op$blocks$op.opparams.s)
         d <- blockValue(op$blocks$op.opparams.d)
         mag <- TeXget("mag", state)
@@ -461,6 +478,7 @@ op_font_def <- function(op, state) {
                                  variations=attr(fontfile, "variations"),
                                  ## For pixel adjustments
                                  fontSpace=s %/% 6,
+                                 scriptType=scriptType,
                                  op=op)
         TeXset("fonts", fonts, state)
     }
