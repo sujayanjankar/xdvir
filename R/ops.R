@@ -83,7 +83,7 @@ setChar <- function(raw, put=FALSE, state) {
     ## Lots of things depend on text direction
     dir <- TeXget("dir", state)
     engine <- TeXget("engine", state)
-    id <- engine$glyphIndex(raw, font$file, fontLib)
+    id <- engine$glyphIndex(raw, font$file, fontLib, dir)
     bbox <- TeXglyphBounds(id, font$file, font$size, fontLib, state)
     if (dir == 0) {
         width <- TeXglyphWidth(id, font$file, font$size, fontLib, state)
