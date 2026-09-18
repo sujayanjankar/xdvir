@@ -85,8 +85,9 @@ setChar <- function(raw, put=FALSE, state) {
     engine <- TeXget("engine", state)
     id <- engine$glyphIndex(raw, font$file, fontLib, dir)
     bbox <- TeXglyphBounds(id, font$file, font$size, fontLib, state)
+    width <- TeXglyphWidth(id, font$file, font$size, fontLib, state)
+    height <- TeXglyphHeight(id, font$file, font$size, fontLib, state)
     if (dir == 0) {
-        width <- TeXglyphWidth(id, font$file, font$size, fontLib, state)
         ## Position glyph then move
         x <- h
         y <- v
@@ -104,23 +105,21 @@ setChar <- function(raw, put=FALSE, state) {
         updateTextLeft(h, state)
         updateTextRight(h + width[1], state)
     } else {
-        width <- TeXglyphWidth(id, font$file, font$size, fontLib, state)
-        height <- TeXglyphHeight(id, font$file, font$size, fontLib, state)
         isLatin <- font$scriptType == SCRIPT_TYPE_LATIN
         x <- h
         xx <- hh
-        y <- ifelse(isLatin, (v - width), v)
+        y <- ifelse(isLatin, v - font$size, v)
         yy <- vv
         glyph <- glyph(x, y, xx, yy, id, f, font$size, colour=colour[1],
             rotation = ifelse(isLatin, rotation_radians, 0))
+        # Same for both directions.
         updateBBoxHoriz(h + bbox[1], state) ## left
         updateBBoxHoriz(h + bbox[3], state) ## right
         updateBBoxVert(v - bbox[2], state) ## bottom
         updateBBoxVert(v - bbox[4], state) ## top
         if (!put) {
-            move_by <- ifelse(isLatin, width[1], height)
-            TeXset("vv", vv + round(TeX2px(move_by, state)), state)
-            moveDown(move_by, state)
+            moveBy <- ifelse(isLatin, width, height)
+            moveDown(moveBy,  state)
         }
     }
     addGlyph(glyph, state)
@@ -351,7 +350,7 @@ op_down <- function(op, state) {
         moveDown(a, state)
     } else {
         hSpace(-a, state)
-        # Don't need to move right when moving down.
+        # Don't need to move right on a vertical move.
         # moveRight(-a, state)
     }
 }
@@ -375,7 +374,7 @@ op_y <- function(op, state) {
         moveDown(y, state)
     } else {
         hSpace(-y, state)
-        # Don't need to move right on a y-move.
+        # Don't need to move right on a vertical move.
         # moveRight(-y, state)
     }
 }
@@ -399,7 +398,8 @@ op_z <- function(op, state) {
         moveDown(z, state)
     } else {
         hSpace(-z, state)
-        moveRight(-z, state)
+        # Don't need to move right on a vertical move.
+        # moveRight(-z, state)
     }
 }
 
