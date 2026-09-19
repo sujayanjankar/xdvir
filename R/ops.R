@@ -86,7 +86,6 @@ setChar <- function(raw, put=FALSE, state) {
     id <- engine$glyphIndex(raw, font$file, fontLib, dir)
     bbox <- TeXglyphBounds(id, font$file, font$size, fontLib, state)
     width <- TeXglyphWidth(id, font$file, font$size, fontLib, state)
-    height <- TeXglyphHeight(id, font$file, font$size, fontLib, state)
     if (dir == 0) {
         ## Position glyph then move
         x <- h
@@ -105,6 +104,8 @@ setChar <- function(raw, put=FALSE, state) {
         updateTextLeft(h, state)
         updateTextRight(h + width[1], state)
     } else {
+        # TODO: Glyph height will be undefined for other font libraries.
+        height <- TeXglyphHeight(id, font$file, font$size, fontLib, state)
         isLatin <- font$scriptType == SCRIPT_TYPE_LATIN
         x <- h
         xx <- hh
