@@ -164,6 +164,13 @@ setRule <- function(op, put=FALSE, state) {
     addGlyphObjs(state)
     aa <- rulePixels(a, state)
     bb <- rulePixels(b, state)
+    dir <- TeXget("dir", state)
+    # Flip the height and width to flip the rule on its side.
+    if (dir == 1) {
+        tmp <- a
+        a <- b
+        b <- tmp
+    }
     addRuleObj(a, b, aa, bb, state)
     if (!put) {
         TeXset("hh", hh + bb, state)
