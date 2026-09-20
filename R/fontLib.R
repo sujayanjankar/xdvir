@@ -7,7 +7,7 @@ FontLibrary <- function(glyphWidth,
                         glyphBounds,
                         ## Glyph integer index from UNICODE
                         glyphIndex,
-                        resolveScriptType=NULL) {
+                        resolveScriptType) {
     fontLib <- list(glyphWidth=glyphWidth,
                     glyphHeight=glyphHeight,
                     glyphBounds=glyphBounds,

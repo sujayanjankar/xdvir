@@ -462,13 +462,7 @@ op_font_def <- function(op, state) {
                           collapse="")
         fontfile <- engine$fontFile(fontname)
         scriptType <- match.arg(
-            # Assumes Latin script if the resolution function is not defined.
-            # TODO: Should be documented.
-            ifelse(
-                is.null(fontLib$resolveScriptType),
-                SCRIPT_TYPE_LATIN,
-                fontLib$resolveScriptType(fontname)
-            ),
+            fontLib$resolveScriptType(fontname),
             SUPPORTED_SCRIPT_TYPES
         )
         if (is.null(scriptType)) {
