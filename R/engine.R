@@ -11,7 +11,10 @@ TeXengine <- function(name,
                       glyphIndex,
                       options=NULL,
                       preamble="",
-                      dviSuffix=".dvi") {
+                      dviSuffix=".dvi",
+                      emulation = TRUE,
+                      buildArgs = NULL,
+                      fontPreset = NULL) {
     engine <- list(name=name,
                    version=version,
                    command=command,
@@ -20,7 +23,10 @@ TeXengine <- function(name,
                    glyphIndex=glyphIndex,
                    options=options,
                    preamble=preamble,
-                   dviSuffix=dviSuffix)
+                   dviSuffix=dviSuffix,
+                   emulation=emulation,
+                   buildArgs=buildArgs,
+                   fontPreset=fontPreset)
     class(engine) <- "TeXengine"
     engine
 }
@@ -88,7 +94,7 @@ resolveEngine.LaTeXdocument <- function(x, engine) {
 ## which MAY include "engine" comment.
 ## If TeX code does not include "engine" comment, use non-NULL user engine.
 ## If neither provides an engine, default to "xdvir.engine" option.
-## If TeX code does include "engine" comment, 
+## If TeX code does include "engine" comment,
 ##   if no user engine, use "engine" attribute
 ##   if user specifies engine, check for mismatches, but user engine wins.
 resolveEngine.character <- function(x, engine) {
@@ -114,7 +120,7 @@ resolveEngine.character <- function(x, engine) {
 ## Resolve for DVI object, which MAY include "engine" comment in pre op.
 ## If pre op does not include "engine" comment, use non-NULL user engine.
 ## If neither provides an engine, default to "xdvir.engine" option.
-## If DVI does include "engine" comment, 
+## If DVI does include "engine" comment,
 ##   if no user engine, use "engine" attribute
 ##   if user specifies engine, check for mismatches, but user engine wins.
 resolveEngine.DVI <- function(x, engine) {

@@ -4,7 +4,7 @@ nullEngine <- TeXengine(name="null",
                         version=packageVersion("xdvir"),
                         command=NULL,
                         isEngine=function(dvi) FALSE,
-                        glyphIndex=function(raw, fontname, fontLib)
+                        glyphIndex=function(raw, fontname, fontLib, direction)
                             glyphIndex(raw, fontname, fontLib),
                         fontFile=function(fontname)
                             gsub("[[]|[]].*", "", fontname))
