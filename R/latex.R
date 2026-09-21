@@ -18,7 +18,7 @@ buildTeX <- function(tex, gp) {
         colour <- rep(gp$col, length.out=n)
         engine <- getOption("xdvir.engine")
         buildPreset <- engine$fontPreset %||% preset
-        prefix <- buildPreset(family, fontface, size, lineheight, colour)
+        prefix <- buildPreset(family, face, size, lineheight, colour)
         ## \n to complete the paragraph
         tex <- paste(prefix, tex, "\n", sep="")
         attr(tex, "packages") <- attr(prefix, "packages")
