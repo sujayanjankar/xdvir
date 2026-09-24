@@ -1,16 +1,19 @@
 
 ## ggplot2 theme element supporting latex syntax
 
-latex_grob <- function(label, x, y, hjust, vjust, 
+latex_grob <- function(label, x, y, hjust, vjust,
                        angle, family, fontface, colour, size, lineheight,
-                       margin, width, packages, engine, rotMargins) {
+                       margin, width, packages, engine, rotMargins,
+                       documentClass) {
     if (rotMargins) {
         ## ggplot2 margin is tlbr;  grid.latex() margin is bltr
         latexMargin <- margin[c(3, 4, 1, 2)]
     } else {
         latexMargin <- 0
     }
-    prefix <- preset(family, fontface, size, lineheight, colour)
+    engine <- getOption("xdvir.engine")
+    buildPreset <- engine$fontPreset %||% preset
+    prefix <- buildPreset(family, fontface, size, lineheight, colour)
     tex <- paste(prefix, label, "\n", sep="")
     ## Force in "preview" package
     packages <- unique(c(packages, "preview", attr(prefix, "packages")))
@@ -20,7 +23,8 @@ latex_grob <- function(label, x, y, hjust, vjust,
                        margin=latexMargin, width=width,
                        packages=packages,
                        engine=engine,
-                       gp=NULL)
+                       gp=NULL,
+                       documentClass=documentClass)
     if (rotMargins) {
         vp <- NULL
     } else {
@@ -32,7 +36,7 @@ latex_grob <- function(label, x, y, hjust, vjust,
     gTree(children=gList(child),
           vp=vp,
           ## Record these for width/heightDetails (x/yDetails not required)
-          margin=margin, rotMargins=rotMargins,
+          margin=margin, rotMargins=rotMargins, documentClass=documentClass,
           cl="latex_grob")
 }
 
@@ -67,12 +71,13 @@ element_latex <- function(family=NULL,
                           packages=NULL,
                           engine=getOption("xdvir.engine"),
                           rotate_margins=FALSE,
-                          inherit.blank=FALSE) {
+                          inherit.blank=FALSE,
+                          documentClass=NULL) {
     if (!is.null(color))
         colour <- color
     n <- max(length(family),
              length(fontface),
-             length(colour), 
+             length(colour),
              length(hjust), length(vjust),
              length(angle))
     if (n > 1) {
@@ -84,13 +89,14 @@ element_latex <- function(family=NULL,
                    colour=colour,
                    size=size,
                    hjust=hjust, vjust=vjust,
-                   angle=angle, 
+                   angle=angle,
                    margin=margin,
                    width=width,
                    packages=packages,
                    engine=engine,
                    rotate_margins=rotate_margins,
-                   inherit.blank=inherit.blank),
+                   inherit.blank=inherit.blank,
+                   documentClass=documentClass),
               class=c("element_latex", "element_text", "element"))
 }
 
@@ -111,6 +117,8 @@ element_grob.element_latex <- function(element,
                                        packages=NULL,
                                        engine=getOption("xdvir.engine"),
                                        ...) {
+
+    documentClass <- element$documentClass
     if (is.null(label))
         return(ggplot2::zeroGrob())
     family <- family %||% element$family
@@ -144,7 +152,7 @@ element_grob.element_latex <- function(element,
 
     ## Often called with missing x or y that is then inferred from hjust/vjust
     numjust <- rotate_just(angle, hjust, vjust)
-  
+
     n <- max(length(x), length(y), 1)
     x <- x %||% unit(rep(numjust$hjust, n), "npc")
     y <- y %||% unit(rep(numjust$vjust, n), "npc")
@@ -171,7 +179,8 @@ element_grob.element_latex <- function(element,
                width=width,
                packages=packages,
                engine=engine,
-               rotMargins=element$rotate_margins)
+               rotMargins=element$rotate_margins,
+               documentClass=documentClass)
 }
 
 on_load({
@@ -197,7 +206,7 @@ rotate_just <- function(angle, hjust, vjust) {
                                ## top
                                1))
     }
-    
+
     hnew <- ifelse(
         0 <= angle & angle < 90,
         hjust,
@@ -211,7 +220,7 @@ rotate_just <- function(angle, hjust, vjust) {
             )
             )
     )
-    
+
     vnew <- ifelse(
         0 <= angle & angle < 90,
         vjust,
@@ -225,7 +234,7 @@ rotate_just <- function(angle, hjust, vjust) {
             )
             )
     )
-    
+
     list(hjust=hnew, vjust=vnew)
 }
 

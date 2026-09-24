@@ -59,7 +59,7 @@ makeContent.LaTeXgrob <- function(x, ...) {
 xDetails.LaTeXgrob <- function(x, theta) {
     tex <- buildTeX(x$tex, x$gpar)
     packages <- c(x$packages, attr(tex, "packages"))
-    dvi <- buildDVI(tex, x$width, packages, x$engine, x$texFile)
+    dvi <- buildDVI(tex, x$width, packages, x$engine, x$texFile, x$documentClass)
     xDetails(dviGrob(dvi,
                      x=x$x, y=x$y, margin=x$margin, rot=x$rot,
                      hjust=x$hjust, vjust=x$vjust,
@@ -74,7 +74,7 @@ xDetails.LaTeXgrob <- function(x, theta) {
 yDetails.LaTeXgrob <- function(x, theta) {
     tex <- buildTeX(x$tex, x$gpar)
     packages <- c(x$packages, attr(tex, "packages"))
-    dvi <- buildDVI(tex, x$width, packages, x$engine, x$texFile)
+    dvi <- buildDVI(tex, x$width, packages, x$engine, x$texFile, x$documentClass)
     yDetails(dviGrob(dvi,
                      x=x$x, y=x$y, margin=x$margin, rot=x$rot,
                      hjust=x$hjust, vjust=x$vjust,
@@ -89,7 +89,7 @@ yDetails.LaTeXgrob <- function(x, theta) {
 widthDetails.LaTeXgrob <- function(x) {
     tex <- buildTeX(x$tex, x$gpar)
     packages <- c(x$packages, attr(tex, "packages"))
-    dvi <- buildDVI(tex, x$width, packages, x$engine, x$texFile)
+    dvi <- buildDVI(tex, x$width, packages, x$engine, x$texFile, x$documentClass)
     widthDetails(dviGrob(dvi,
                          x=x$x, y=x$y, margin=x$margin, rot=x$rot,
                          hjust=x$hjust, vjust=x$vjust,
@@ -103,7 +103,7 @@ widthDetails.LaTeXgrob <- function(x) {
 heightDetails.LaTeXgrob <- function(x) {
     tex <- buildTeX(x$tex, x$gpar)
     packages <- c(x$packages, attr(tex, "packages"))
-    dvi <- buildDVI(tex, x$width, packages, x$engine, x$texFile)
+    dvi <- buildDVI(tex, x$width, packages, x$engine, x$texFile, x$documentClass)
     heightDetails(dviGrob(dvi,
                           x=x$x, y=x$y, margin=x$margin, rot=x$rot,
                           hjust=x$hjust, vjust=x$vjust,

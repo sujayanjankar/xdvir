@@ -107,9 +107,9 @@ setChar <- function(raw, put=FALSE, state) {
         # TODO: Glyph height will be undefined for other font libraries.
         height <- TeXglyphHeight(id, font$file, font$size, fontLib, state)
         isLatin <- font$scriptType == SCRIPT_TYPE_LATIN
-        x <- h
+        x <- ifelse(isLatin, h + font$fontSpace, h)
         xx <- hh
-        y <- ifelse(isLatin, v - font$size, v)
+        y <- ifelse(isLatin, v - (font$size - font$fontSpace), v)
         yy <- vv
         glyph <- glyph(x, y, xx, yy, id, f, font$size, colour=colour[1],
             rotation = ifelse(isLatin, rotation_radians, 0))
