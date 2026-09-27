@@ -94,7 +94,7 @@ resolveEngine.LaTeXdocument <- function(x, engine) {
 ## which MAY include "engine" comment.
 ## If TeX code does not include "engine" comment, use non-NULL user engine.
 ## If neither provides an engine, default to "xdvir.engine" option.
-## If TeX code does include "engine" comment,
+## If TeX code does include "engine" comment, 
 ##   if no user engine, use "engine" attribute
 ##   if user specifies engine, check for mismatches, but user engine wins.
 resolveEngine.character <- function(x, engine) {
@@ -120,7 +120,7 @@ resolveEngine.character <- function(x, engine) {
 ## Resolve for DVI object, which MAY include "engine" comment in pre op.
 ## If pre op does not include "engine" comment, use non-NULL user engine.
 ## If neither provides an engine, default to "xdvir.engine" option.
-## If DVI does include "engine" comment,
+## If DVI does include "engine" comment, 
 ##   if no user engine, use "engine" attribute
 ##   if user specifies engine, check for mismatches, but user engine wins.
 resolveEngine.DVI <- function(x, engine) {

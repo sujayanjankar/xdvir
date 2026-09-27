@@ -45,7 +45,7 @@ export("readDVI",
        "tikzPackage", "tikzPicture",
 
        "author", "typeset", "render",
-
+       
        "grid.dvi", "dviGrob",
 
        "grid.latex", "latexGrob",

@@ -39,7 +39,7 @@ moveRight <- function(x, state) {
         }
         TeXset("hh", hh, state)
     }
-    TeXset("h", h + x, state)
+    TeXset("h", h + x, state)        
 }
 
 moveDown <- function(x, state) {
@@ -56,7 +56,7 @@ moveDown <- function(x, state) {
         }
         TeXset("vv", vv, state)
     }
-    TeXset("v", v + x, state)
+    TeXset("v", v + x, state)        
 }
 
 ## set_char_i and set_char are VERY similar
@@ -416,7 +416,7 @@ op_z <- function(op, state) {
 op_fnt_num <- function(op, state) {
     ## Maintain font number
     ## + 1 for 1-based indexing
-    f <- blockValue(op$blocks$op.opcode) - 171 + 1
+    f <- blockValue(op$blocks$op.opcode) - 171 + 1 
     TeXset("f", f, state)
 }
 
@@ -454,7 +454,7 @@ op_font_def <- function(op, state) {
     ## Create font definition and save it
     fonts <- TeXget("fonts", state)
     fontnum <- blockValue(op$blocks$op.opparams.k) + 1
-    ## Avoid redefining the same font
+    ## Avoid redefining the same font 
     if (is.null(fonts[[fontnum]]) ||
         !(identical_font(op, fonts[[fontnum]]$op))) {
         ## Reduce vector of individual characters to single character value
@@ -549,7 +549,7 @@ op_x_font_def <- function(op, state) {
     ## Create font definition and save it
     fonts <- TeXget("fonts", state)
     fontnum <- blockValue(op$blocks$op.opparams.fontnum) + 1
-    ## Avoid redefining the same font
+    ## Avoid redefining the same font 
     if (is.null(fonts[[fontnum]]) ||
         !(identical_font(op, fonts[[fontnum]]$op))) {
         fontnameChars <-
@@ -561,7 +561,7 @@ op_x_font_def <- function(op, state) {
                                  index=fontindex,
                                  size=fontsize*(mag/1000),
                                  ## For pixel adjustments
-                                 fontSpace=fontsize %/% 6,
+                                 fontSpace=fontsize %/% 6, 
                                  op=op)
         TeXset("fonts", fonts, state)
     }
@@ -696,7 +696,7 @@ operationNames[253] <- "x_fnt_def"
 operationNames[254] <- "x_glyph"
 operationNames[255] <- "x_glyph_str"
 operationNames[256] <- "dir"
-
+    
 opNames <- function(codes) {
     if (!length(codes) ||
         !all(is.finite(codes)) ||

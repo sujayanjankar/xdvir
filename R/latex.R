@@ -1,11 +1,11 @@
 
 ## MUST be run within, e.g., makeContent(), so that grob gp slot has
 ## already been enforced (so get.gpar() result is relevant)
-buildTeX <- function(tex, gp) {
+buildTeX <- function(tex, gp, engine) {
     ## 'gp' could be NULL
     ## In which case we do NOT want to pick up current font family etc
     ## (must be here because width is non-NA and relative)
-    if (is.null(gp) || length(gp) == 0) {
+    if (is.null(gp)) {
         tex
     } else {
         gp <- get.gpar()
@@ -16,8 +16,7 @@ buildTeX <- function(tex, gp) {
         size <- rep(gp$fontsize, length.out=n)
         lineheight <- rep(gp$lineheight, length.out=n)
         colour <- rep(gp$col, length.out=n)
-        engine <- getOption("xdvir.engine")
-        buildPreset <- engine$fontPreset %||% preset
+        buildPreset <- getEngine(engine)$fontPreset %||% preset
         prefix <- buildPreset(family, face, size, lineheight, colour)
         ## \n to complete the paragraph
         tex <- paste(prefix, tex, "\n", sep="")
@@ -42,7 +41,7 @@ buildDVI <- function(tex, width, packages, engine, texFile, documentClass="stand
 }
 
 makeContent.LaTeXgrob <- function(x, ...) {
-    tex <- buildTeX(x$tex, x$gpar)
+    tex <- buildTeX(x$tex, x$gpar, x$engine)
     packages <- c(x$packages, attr(tex, "packages"))
     dvi <- buildDVI(tex, x$width, packages, x$engine, x$texFile, x$documentClass)
     setChildren(x,
@@ -57,7 +56,7 @@ makeContent.LaTeXgrob <- function(x, ...) {
 }
 
 xDetails.LaTeXgrob <- function(x, theta) {
-    tex <- buildTeX(x$tex, x$gpar)
+    tex <- buildTeX(x$tex, x$gpar, x$engine)
     packages <- c(x$packages, attr(tex, "packages"))
     dvi <- buildDVI(tex, x$width, packages, x$engine, x$texFile, x$documentClass)
     xDetails(dviGrob(dvi,
@@ -72,7 +71,7 @@ xDetails.LaTeXgrob <- function(x, theta) {
 }
 
 yDetails.LaTeXgrob <- function(x, theta) {
-    tex <- buildTeX(x$tex, x$gpar)
+    tex <- buildTeX(x$tex, x$gpar, x$engine)
     packages <- c(x$packages, attr(tex, "packages"))
     dvi <- buildDVI(tex, x$width, packages, x$engine, x$texFile, x$documentClass)
     yDetails(dviGrob(dvi,
@@ -87,7 +86,7 @@ yDetails.LaTeXgrob <- function(x, theta) {
 }
 
 widthDetails.LaTeXgrob <- function(x) {
-    tex <- buildTeX(x$tex, x$gpar)
+    tex <- buildTeX(x$tex, x$gpar, x$engine)
     packages <- c(x$packages, attr(tex, "packages"))
     dvi <- buildDVI(tex, x$width, packages, x$engine, x$texFile, x$documentClass)
     widthDetails(dviGrob(dvi,
@@ -101,7 +100,7 @@ widthDetails.LaTeXgrob <- function(x) {
 }
 
 heightDetails.LaTeXgrob <- function(x) {
-    tex <- buildTeX(x$tex, x$gpar)
+    tex <- buildTeX(x$tex, x$gpar, x$engine)
     packages <- c(x$packages, attr(tex, "packages"))
     dvi <- buildDVI(tex, x$width, packages, x$engine, x$texFile, x$documentClass)
     heightDetails(dviGrob(dvi,

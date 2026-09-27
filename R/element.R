@@ -1,7 +1,7 @@
 
 ## ggplot2 theme element supporting latex syntax
 
-latex_grob <- function(label, x, y, hjust, vjust,
+latex_grob <- function(label, x, y, hjust, vjust, 
                        angle, family, fontface, colour, size, lineheight,
                        margin, width, packages, engine, rotMargins,
                        documentClass) {
@@ -11,8 +11,7 @@ latex_grob <- function(label, x, y, hjust, vjust,
     } else {
         latexMargin <- 0
     }
-    engine <- getOption("xdvir.engine")
-    buildPreset <- engine$fontPreset %||% preset
+    buildPreset <- getEngine(engine)$fontPreset %||% preset
     prefix <- buildPreset(family, fontface, size, lineheight, colour)
     tex <- paste(prefix, label, "\n", sep="")
     ## Force in "preview" package
@@ -77,7 +76,7 @@ element_latex <- function(family=NULL,
         colour <- color
     n <- max(length(family),
              length(fontface),
-             length(colour),
+             length(colour), 
              length(hjust), length(vjust),
              length(angle))
     if (n > 1) {
@@ -89,7 +88,7 @@ element_latex <- function(family=NULL,
                    colour=colour,
                    size=size,
                    hjust=hjust, vjust=vjust,
-                   angle=angle,
+                   angle=angle, 
                    margin=margin,
                    width=width,
                    packages=packages,
@@ -115,10 +114,7 @@ element_grob.element_latex <- function(element,
                                        width=NULL,
                                        margin_x=FALSE, margin_y=FALSE,
                                        packages=NULL,
-                                       engine=getOption("xdvir.engine"),
                                        ...) {
-
-    documentClass <- element$documentClass
     if (is.null(label))
         return(ggplot2::zeroGrob())
     family <- family %||% element$family
@@ -152,7 +148,7 @@ element_grob.element_latex <- function(element,
 
     ## Often called with missing x or y that is then inferred from hjust/vjust
     numjust <- rotate_just(angle, hjust, vjust)
-
+  
     n <- max(length(x), length(y), 1)
     x <- x %||% unit(rep(numjust$hjust, n), "npc")
     y <- y %||% unit(rep(numjust$vjust, n), "npc")
@@ -166,6 +162,8 @@ element_grob.element_latex <- function(element,
 
     packages <- packages %||% element$packages %||% NULL
 
+    engine <- element$engine
+    documentClass <- element$documentClass
     latex_grob(label,
                x=x, y=y,
                hjust=hjust, vjust=vjust,
@@ -206,7 +204,7 @@ rotate_just <- function(angle, hjust, vjust) {
                                ## top
                                1))
     }
-
+    
     hnew <- ifelse(
         0 <= angle & angle < 90,
         hjust,
@@ -220,7 +218,7 @@ rotate_just <- function(angle, hjust, vjust) {
             )
             )
     )
-
+    
     vnew <- ifelse(
         0 <= angle & angle < 90,
         vjust,
@@ -234,7 +232,7 @@ rotate_just <- function(angle, hjust, vjust) {
             )
             )
     )
-
+    
     list(hjust=hnew, vjust=vnew)
 }
 
