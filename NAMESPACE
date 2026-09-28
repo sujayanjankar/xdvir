@@ -42,7 +42,7 @@ export("readDVI",
 
        "LaTeXpackage", "registerPackage",
        "fontspecPackage", "xcolorPackage", "previewPackage",
-       "tikzPackage", "tikzPicture",
+       "tikzPackage", "tikzPicture", "minipagePackage",
 
        "author", "typeset", "render",
        

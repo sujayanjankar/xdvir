@@ -107,7 +107,7 @@ setChar <- function(raw, put=FALSE, state) {
         # TODO: Glyph height will be undefined for other font libraries.
         height <- TeXglyphHeight(id, font$file, font$size, fontLib, state)
         isLatin <- font$scriptType == SCRIPT_TYPE_LATIN
-        x <- ifelse(isLatin, h + font$fontSpace, h)
+        x <- ifelse(isLatin, h + font$size / 2, h)
         xx <- hh
         y <- ifelse(isLatin, v - (font$size - font$fontSpace), v)
         yy <- vv
@@ -358,8 +358,7 @@ op_down <- function(op, state) {
         moveDown(a, state)
     } else {
         hSpace(-a, state)
-        # Don't need to move right on a vertical move.
-        # moveRight(-a, state)
+        moveRight(-a, state)
     }
 }
 
@@ -382,8 +381,7 @@ op_y <- function(op, state) {
         moveDown(y, state)
     } else {
         hSpace(-y, state)
-        # Don't need to move right on a vertical move.
-        # moveRight(-y, state)
+        moveRight(-y, state)
     }
 }
 
@@ -406,8 +404,7 @@ op_z <- function(op, state) {
         moveDown(z, state)
     } else {
         hSpace(-z, state)
-        # Don't need to move right on a vertical move.
-        # moveRight(-z, state)
+        moveRight(-z, state)
     }
 }
 
