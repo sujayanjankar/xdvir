@@ -4,7 +4,7 @@ nullEngine <- TeXengine(name="null",
                         version=packageVersion("xdvir"),
                         command=NULL,
                         isEngine=function(dvi) FALSE,
-                        glyphIndex=function(raw, fontname, fontLib)
+                        glyphIndex=function(raw, fontname, fontLib, direction)
                             glyphIndex(raw, fontname, fontLib),
                         fontFile=function(fontname)
                             gsub("[[]|[]].*", "", fontname))
@@ -63,6 +63,7 @@ registerEngine(nullEngine)
     registerPackage(tikzPackage(quote=tikzQuote))
     registerPackage(tikzPicture(quote=tikzQuote))
     registerPackage(zrefPackage())
+    registerPackage(minipagePackage())
     ## Default Font Library
     options(xdvir.fontLib=FTfontLibrary)
     options(xdvir.quiet=TRUE)

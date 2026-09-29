@@ -2,6 +2,13 @@
 ## Functions for sweeping through operations within DVI file
 
 op_ignore <- function(op, state) { }
+rotation_degrees <- -90
+rotation_radians <- rotation_degrees * (pi / 180)
+
+## Script types
+SCRIPT_TYPE_CJK <- "CJK"
+SCRIPT_TYPE_LATIN <- "LATIN"
+SUPPORTED_SCRIPT_TYPES <- c(SCRIPT_TYPE_CJK, SCRIPT_TYPE_LATIN)
 
 ## Glyph index from raw bytes
 glyphIndex <- function(raw, filename, fontLib) {
@@ -76,10 +83,10 @@ setChar <- function(raw, put=FALSE, state) {
     ## Lots of things depend on text direction
     dir <- TeXget("dir", state)
     engine <- TeXget("engine", state)
-    id <- engine$glyphIndex(raw, font$file, fontLib)
+    id <- engine$glyphIndex(raw, font$file, fontLib, dir)
     bbox <- TeXglyphBounds(id, font$file, font$size, fontLib, state)
+    width <- TeXglyphWidth(id, font$file, font$size, fontLib, state)
     if (dir == 0) {
-        width <- TeXglyphWidth(id, font$file, font$size, fontLib, state)
         ## Position glyph then move
         x <- h
         y <- v
@@ -97,24 +104,24 @@ setChar <- function(raw, put=FALSE, state) {
         updateTextLeft(h, state)
         updateTextRight(h + width[1], state)
     } else {
+        # TODO: Glyph height will be undefined for other font libraries.
         height <- TeXglyphHeight(id, font$file, font$size, fontLib, state)
-        ## Position glyph then move
-        x <- h
+        isLatin <- font$scriptType == SCRIPT_TYPE_LATIN
+        x <- ifelse(isLatin, h + font$size / 2, h)
         xx <- hh
-        ## y origin is v + bbox[4] (ymax) + height[2] (tsb)
-        y <- v + bbox[4] + height[2]
-        yy <- vv + round(TeX2px(bbox[4] + height[2], state))
-        glyph <- glyph(x, y, xx, yy, id, f, font$size, colour=colour[1])
+        y <- ifelse(isLatin, v - (font$size - font$fontSpace), v)
+        yy <- vv
+        glyph <- glyph(x, y, xx, yy, id, f, font$size, colour=colour[1],
+            rotation = ifelse(isLatin, rotation_radians, 0))
+        # Same for both directions.
         updateBBoxHoriz(h + bbox[1], state) ## left
         updateBBoxHoriz(h + bbox[3], state) ## right
-        updateBBoxVert(v + bbox[2], state) ## bottom
-        updateBBoxVert(v + bbox[4] + height[2], state) ## top
+        updateBBoxVert(v - bbox[2], state) ## bottom
+        updateBBoxVert(v - bbox[4], state) ## top
         if (!put) {
-            TeXset("vv", vv + round(TeX2px(height[1], state)), state)
-            moveDown(height[1], state)
+            moveBy <- ifelse(isLatin, width, height)
+            moveDown(moveBy,  state)
         }
-        updateTextLeft(h, state)
-        updateTextRight(h + bbox[2], state)
     }
     addGlyph(glyph, state)
 }
@@ -158,6 +165,13 @@ setRule <- function(op, put=FALSE, state) {
     addGlyphObjs(state)
     aa <- rulePixels(a, state)
     bb <- rulePixels(b, state)
+    dir <- TeXget("dir", state)
+    # Flip the height and width to flip the rule on its side.
+    if (dir == 1) {
+        tmp <- a
+        a <- b
+        b <- tmp
+    }
     addRuleObj(a, b, aa, bb, state)
     if (!put) {
         TeXset("hh", hh + bb, state)
@@ -279,7 +293,8 @@ op_right <- function(op, state) {
         moveRight(b, state)
     } else {
         vSpace(b, state)
-        moveDown(b, state)
+        # Don't need to move down on a right shift.
+        # moveDown(b, state)
     }
 }
 
@@ -443,6 +458,16 @@ op_font_def <- function(op, state) {
         fontname <- paste(blockValue(op$blocks$op.opparams.fontname.name),
                           collapse="")
         fontfile <- engine$fontFile(fontname)
+        scriptType <- match.arg(
+            fontLib$resolveScriptType(fontname),
+            SUPPORTED_SCRIPT_TYPES
+        )
+        if (is.null(scriptType)) {
+            stop(
+                "Only these script types are supported: ",
+                paste(SUPPORTED_SCRIPT_TYPES, collapse = ", ")
+            )
+        }
         s <- blockValue(op$blocks$op.opparams.s)
         d <- blockValue(op$blocks$op.opparams.d)
         mag <- TeXget("mag", state)
@@ -451,7 +476,8 @@ op_font_def <- function(op, state) {
                                  size=s*(mag/1000),
                                  variations=attr(fontfile, "variations"),
                                  ## For pixel adjustments
-                                 fontSpace=s %/% 6, 
+                                 fontSpace=s %/% 6,
+                                 scriptType=scriptType,
                                  op=op)
         TeXset("fonts", fonts, state)
     }

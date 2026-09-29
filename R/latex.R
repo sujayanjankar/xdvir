@@ -1,7 +1,7 @@
 
 ## MUST be run within, e.g., makeContent(), so that grob gp slot has
 ## already been enforced (so get.gpar() result is relevant)
-buildTeX <- function(tex, gp) {
+buildTeX <- function(tex, gp, engine) {
     ## 'gp' could be NULL
     ## In which case we do NOT want to pick up current font family etc
     ## (must be here because width is non-NA and relative)
@@ -16,22 +16,28 @@ buildTeX <- function(tex, gp) {
         size <- rep(gp$fontsize, length.out=n)
         lineheight <- rep(gp$lineheight, length.out=n)
         colour <- rep(gp$col, length.out=n)
-        prefix <- preset(family, face, size, lineheight, colour)
+        buildPreset <- getEngine(engine)$fontPreset %||% preset
+        prefix <- buildPreset(family, face, size, lineheight, colour)
         ## \n to complete the paragraph
         tex <- paste(prefix, tex, "\n", sep="")
         attr(tex, "packages") <- attr(prefix, "packages")
         tex
-    } 
+    }
 }
 
 ## MUST be run within, e.g., makeContent(), so that width conversion is correct
-buildDVI <- function(tex, width, packages, engine, texFile) {
+buildDVI <- function(tex, width, packages, engine, texFile, documentClass="standalone", height) {
     ## Only author/typeset unique combinations of tex and width
     width <- convertWidth(width, "in", valueOnly=TRUE)
-    uniq <- unique(cbind(tex, width))
-    index <- match(paste(tex, width), apply(uniq, 1, paste, collapse=" "))   
+    height <- convertHeight(height, "in", valueOnly=TRUE)
+    if (isTRUE(height > 0)) {
+        packages <- c(packages, list(minipagePackage(height)))
+    }
+    uniq <- unique(cbind(tex, width, height))
+    index <- match(paste(tex, width, height), apply(uniq, 1, paste, collapse=" "))
     texDocs <- mapply(author, tex=uniq[,1], width=uniq[,2],
-                      MoreArgs=list(engine=engine, packages=packages),
+                      MoreArgs=list(engine=engine, packages=packages,
+                      documentClass=documentClass, height = uniq[,3]),
                       SIMPLIFY=FALSE)
     dvi <- lapply(texDocs, typeset, engine=engine, texFile=texFile)
     ## Re-expand dvis
@@ -39,9 +45,9 @@ buildDVI <- function(tex, width, packages, engine, texFile) {
 }
 
 makeContent.LaTeXgrob <- function(x, ...) {
-    tex <- buildTeX(x$tex, x$gpar)
+    tex <- buildTeX(x$tex, x$gpar, x$engine)
     packages <- c(x$packages, attr(tex, "packages"))
-    dvi <- buildDVI(tex, x$width, packages, x$engine, x$texFile)
+    dvi <- buildDVI(tex, x$width, packages, x$engine, x$texFile, x$documentClass, x$height)
     setChildren(x,
                 gList(dviGrob(dvi,
                               x=x$x, y=x$y, margin=x$margin, rot=x$rot,
@@ -54,9 +60,9 @@ makeContent.LaTeXgrob <- function(x, ...) {
 }
 
 xDetails.LaTeXgrob <- function(x, theta) {
-    tex <- buildTeX(x$tex, x$gpar)
+    tex <- buildTeX(x$tex, x$gpar, x$engine)
     packages <- c(x$packages, attr(tex, "packages"))
-    dvi <- buildDVI(tex, x$width, packages, x$engine, x$texFile)
+    dvi <- buildDVI(tex, x$width, packages, x$engine, x$texFile, x$documentClass, x$height)
     xDetails(dviGrob(dvi,
                      x=x$x, y=x$y, margin=x$margin, rot=x$rot,
                      hjust=x$hjust, vjust=x$vjust,
@@ -69,9 +75,9 @@ xDetails.LaTeXgrob <- function(x, theta) {
 }
 
 yDetails.LaTeXgrob <- function(x, theta) {
-    tex <- buildTeX(x$tex, x$gpar)
+    tex <- buildTeX(x$tex, x$gpar, x$engine)
     packages <- c(x$packages, attr(tex, "packages"))
-    dvi <- buildDVI(tex, x$width, packages, x$engine, x$texFile)
+    dvi <- buildDVI(tex, x$width, packages, x$engine, x$texFile, x$documentClass, x$height)
     yDetails(dviGrob(dvi,
                      x=x$x, y=x$y, margin=x$margin, rot=x$rot,
                      hjust=x$hjust, vjust=x$vjust,
@@ -84,9 +90,9 @@ yDetails.LaTeXgrob <- function(x, theta) {
 }
 
 widthDetails.LaTeXgrob <- function(x) {
-    tex <- buildTeX(x$tex, x$gpar)
+    tex <- buildTeX(x$tex, x$gpar, x$engine)
     packages <- c(x$packages, attr(tex, "packages"))
-    dvi <- buildDVI(tex, x$width, packages, x$engine, x$texFile)
+    dvi <- buildDVI(tex, x$width, packages, x$engine, x$texFile, x$documentClass, x$height)
     widthDetails(dviGrob(dvi,
                          x=x$x, y=x$y, margin=x$margin, rot=x$rot,
                          hjust=x$hjust, vjust=x$vjust,
@@ -98,9 +104,9 @@ widthDetails.LaTeXgrob <- function(x) {
 }
 
 heightDetails.LaTeXgrob <- function(x) {
-    tex <- buildTeX(x$tex, x$gpar)
+    tex <- buildTeX(x$tex, x$gpar, x$engine)
     packages <- c(x$packages, attr(tex, "packages"))
-    dvi <- buildDVI(tex, x$width, packages, x$engine, x$texFile)
+    dvi <- buildDVI(tex, x$width, packages, x$engine, x$texFile, x$documentClass, x$height)
     heightDetails(dviGrob(dvi,
                           x=x$x, y=x$y, margin=x$margin, rot=x$rot,
                           hjust=x$hjust, vjust=x$vjust,
@@ -129,7 +135,9 @@ latexGrob <- function(tex,
                       texFile=NULL,
                       name=NULL,
                       gp=gpar(),
-                      vp=NULL) {
+                      vp=NULL,
+                      documentClass=NULL,
+                      height=NA) {
     if (length(tex) < 1)
         stop("No LaTeX fragment to render")
     if (!is.unit(x))
@@ -139,8 +147,10 @@ latexGrob <- function(tex,
     if (!is.unit(margin))
         margin <- unit(margin, default.units)
     margin <- rep(margin, length.out=4)
-    if (!is.unit(width)) 
+    if (!is.unit(width))
         width <- unit(width, default.units)
+    if (!is.unit(height))
+        height <- unit(height, default.units)
     ## Resolve args
     engine <- getEngine(engine)
     lib <- resolveFontLib(fontLib)
@@ -149,17 +159,18 @@ latexGrob <- function(tex,
         gTree(tex=tex,
               x=x, y=y, margin=margin, rot=rot,
               hjust=hjust, vjust=vjust,
-              width=width,
+              width=width, height=height,
               dpi=dpi,
               page=page,
               engine=engine, packages=pkgs, fontLib=lib,
               texFile=texFile,
               ## retain 'gp' as 'gpar' for child DVIgrob
-              gpar=gp, 
+              gpar=gp,
               name=name, gp=if (is.null(gp)) gpar() else gp, vp=vp,
-              cl="LaTeXgrob")
+              cl="LaTeXgrob",
+              documentClass=documentClass)
     } else {
-        dvi <- buildDVI(tex, width, pkgs, engine, texFile)
+        dvi <- buildDVI(tex, width, pkgs, engine, texFile, documentClass, height)
         dviGrob(dvi,
                 x=x, y=y, margin=margin, rot=rot,
                 hjust=hjust, vjust=vjust,

@@ -99,6 +99,7 @@ make_latex_geom <- function() {
                                 hjust=0.5,
                                 vjust=0.5,
                                 width=NA,
+                                height=NA,
                                 alpha=NA,
                                 family="",
                                 fontface="plain",

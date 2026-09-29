@@ -116,7 +116,9 @@ preset <- function(family, face, size, lineheight, colour) {
 author <- function(tex,
                    width=NA,
                    engine=getOption("xdvir.engine"),
-                   packages=NULL) {
+                   packages=NULL,
+                   documentClass=NULL,
+                   height=NA) {
     if (!is.character(tex))
         stop("'tex' should be a character value containing a LaTeX fragment")
     if (length(tex) < 1)
@@ -124,9 +126,16 @@ author <- function(tex,
     if (length(width) < 1) {
         width <- NA
     }
+    if (length(height) < 1) {
+        height <- NA
+    }
     if (length(width) > 1) {
         warning("Only using first width")
         width <- width[1]
+    }
+    if (length(height) > 1) {
+        warning("Only using first height")
+        height <- height[1]
     }
     if (is.na(width)) {
         varwidth <- "varwidth"
@@ -144,7 +153,11 @@ author <- function(tex,
     }
     texDoc <- c(## Record engine used for authoring
                 comment(engine, pkgNames),
-                paste0("\\documentclass[", varwidth, "]{standalone}"),
+                paste0(
+                    "\\documentclass[", varwidth, "]{",
+                    ifelse(length(documentClass) > 0, documentClass, "standalone"),
+                    "}"
+                ),
                 engine$preamble,
                 packagePreamble(pkgs),
                 "\\begin{document}",
