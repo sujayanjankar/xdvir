@@ -4,7 +4,7 @@
 latex_grob <- function(label, x, y, hjust, vjust, 
                        angle, family, fontface, colour, size, lineheight,
                        margin, width, packages, engine, rotMargins,
-                       documentClass) {
+                       documentClass, fontLib) {
     if (rotMargins) {
         ## ggplot2 margin is tlbr;  grid.latex() margin is bltr
         latexMargin <- margin[c(3, 4, 1, 2)]
@@ -23,7 +23,8 @@ latex_grob <- function(label, x, y, hjust, vjust,
                        packages=packages,
                        engine=engine,
                        gp=NULL,
-                       documentClass=documentClass)
+                       documentClass=documentClass,
+                       fontLib=fontLib)
     if (rotMargins) {
         vp <- NULL
     } else {
@@ -71,7 +72,8 @@ element_latex <- function(family=NULL,
                           engine=getOption("xdvir.engine"),
                           rotate_margins=FALSE,
                           inherit.blank=FALSE,
-                          documentClass=NULL) {
+                          documentClass=NULL,
+                          fontLib=getOption("xdvir.fontLib")) {
     if (!is.null(color))
         colour <- color
     n <- max(length(family),
@@ -95,7 +97,8 @@ element_latex <- function(family=NULL,
                    engine=engine,
                    rotate_margins=rotate_margins,
                    inherit.blank=inherit.blank,
-                   documentClass=documentClass),
+                   documentClass=documentClass,
+                   fontLib=fontLib),
               class=c("element_latex", "element_text", "element"))
 }
 
@@ -164,6 +167,7 @@ element_grob.element_latex <- function(element,
 
     engine <- element$engine
     documentClass <- element$documentClass
+    fontLib <- element$fontLib
     latex_grob(label,
                x=x, y=y,
                hjust=hjust, vjust=vjust,
@@ -178,7 +182,8 @@ element_grob.element_latex <- function(element,
                packages=packages,
                engine=engine,
                rotMargins=element$rotate_margins,
-               documentClass=documentClass)
+               documentClass=documentClass,
+               fontLib=fontLib)
 }
 
 on_load({
