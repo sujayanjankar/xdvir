@@ -4,15 +4,12 @@
 latex_grob <- function(label, x, y, hjust, vjust, 
                        angle, family, fontface, colour, size, lineheight,
                        margin, width, packages, engine, rotMargins,
-                       documentClass, height) {
+                       documentClass) {
     if (rotMargins) {
         ## ggplot2 margin is tlbr;  grid.latex() margin is bltr
         latexMargin <- margin[c(3, 4, 1, 2)]
     } else {
         latexMargin <- 0
-    }
-    if (isTRUE(height > 0)) {
-        packages <- c(packages, list(minipagePackage(height)))
     }
     buildPreset <- getEngine(engine)$fontPreset %||% preset
     prefix <- buildPreset(family, fontface, size, lineheight, colour)
@@ -74,8 +71,7 @@ element_latex <- function(family=NULL,
                           engine=getOption("xdvir.engine"),
                           rotate_margins=FALSE,
                           inherit.blank=FALSE,
-                          documentClass=NULL,
-                          height=NULL) {
+                          documentClass=NULL) {
     if (!is.null(color))
         colour <- color
     n <- max(length(family),
@@ -99,8 +95,7 @@ element_latex <- function(family=NULL,
                    engine=engine,
                    rotate_margins=rotate_margins,
                    inherit.blank=inherit.blank,
-                   documentClass=documentClass,
-                   height=height),
+                   documentClass=documentClass),
               class=c("element_latex", "element_text", "element"))
 }
 
@@ -119,7 +114,6 @@ element_grob.element_latex <- function(element,
                                        width=NULL,
                                        margin_x=FALSE, margin_y=FALSE,
                                        packages=NULL,
-                                       height=NULL,
                                        ...) {
     if (is.null(label))
         return(ggplot2::zeroGrob())
@@ -131,7 +125,6 @@ element_grob.element_latex <- function(element,
     lineheight=lineheight %||% element$lineheight %||% 1
     margin <- margin %||% element$margin %||% ggplot2::margin(0, 0, 0, 0)
     width <- width %||% element$width %||% NA
-    height <- height %||% element$height %||% NA
     angle <- (angle %||% element$angle %||% 0) %% 360
 
     ## NOTE to self:  hjust and vjust should be numeric if sent
@@ -185,8 +178,7 @@ element_grob.element_latex <- function(element,
                packages=packages,
                engine=engine,
                rotMargins=element$rotate_margins,
-               documentClass=documentClass,
-               height=height)
+               documentClass=documentClass)
 }
 
 on_load({

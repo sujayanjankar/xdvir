@@ -63,7 +63,6 @@ registerEngine(nullEngine)
     registerPackage(tikzPackage(quote=tikzQuote))
     registerPackage(tikzPicture(quote=tikzQuote))
     registerPackage(zrefPackage())
-    registerPackage(minipagePackage())
     ## Default Font Library
     options(xdvir.fontLib=FTfontLibrary)
     options(xdvir.quiet=TRUE)
