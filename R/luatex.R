@@ -73,7 +73,7 @@ isLuaTeX <- function(dvi) {
     grepl(luatexVersion(), commentStr)
 }
 
-luaGlyphIndex <- function(raw, fontname, fontLib) {
+luaGlyphIndex <- function(raw, fontname, fontLib, direction) {
     glyphIndex(raw, fontname, fontLib)
 }
 
