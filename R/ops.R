@@ -113,11 +113,17 @@ setChar <- function(raw, put=FALSE, state) {
         yy <- vv
         glyph <- glyph(x, y, xx, yy, id, f, font$size, colour=colour[1],
             rotation = ifelse(isLatin, rotation_radians, 0))
-        # Same for both directions.
-        updateBBoxHoriz(h + bbox[1], state) ## left
-        updateBBoxHoriz(h + bbox[3], state) ## right
-        updateBBoxVert(v - bbox[2], state) ## bottom
-        updateBBoxVert(v - bbox[4], state) ## top
+        if (isLatin) {
+            updateBBoxVert(y + bbox["left"], state)
+            updateBBoxVert(y + bbox["right"], state)
+            updateBBoxHoriz(x + bbox["bottom"], state)
+            updateBBoxHoriz(x + bbox["top"], state)
+        } else {
+            updateBBoxHoriz(h + bbox["left"], state) ## left
+            updateBBoxHoriz(h + bbox["right"], state) ## right
+            updateBBoxVert(v - bbox["bottom"], state) ## bottom
+            updateBBoxVert(v - bbox["top"], state) ## top
+        }
         if (!put) {
             moveBy <- ifelse(isLatin, width, height)
             moveDown(moveBy,  state)
