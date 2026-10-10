@@ -60,7 +60,7 @@ objToGrob.XDVIRruleObj <- function(obj, dx, dy, dpi, ..., state) {
     if (obj$dir == 1) {
         w <- width; width <- height; height <- w
         x <- x + height
-        y <- y + height / 2
+        y <- y - height
     }
     subrule <- getOption("xdvir.substituteRule")
     if ((width < .75 || height < .75) &&

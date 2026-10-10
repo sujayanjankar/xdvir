@@ -107,17 +107,26 @@ setChar <- function(raw, put=FALSE, state) {
         # TODO: Glyph height will be undefined for other font libraries.
         height <- TeXglyphHeight(id, font$file, font$size, fontLib, state)
         isLatin <- font$scriptType == SCRIPT_TYPE_LATIN
+        moveBy <- ifelse(isLatin, width, height)
         x <- ifelse(isLatin, h + font$size / 2, h)
         xx <- hh
-        y <- ifelse(isLatin, v - (font$size - font$fontSpace), v)
+        if (isLatin) {
+            inkCentre <- -((bbox["left"] + bbox["right"]) / 2)
+        } else {
+            inkCentre <- (bbox["bottom"] + bbox["top"]) / 2
+        } 
+        advanceCentre <- v + moveBy / 2
+        y <- advanceCentre + inkCentre
         yy <- vv
         glyph <- glyph(x, y, xx, yy, id, f, font$size, colour=colour[1],
             rotation = ifelse(isLatin, rotation_radians, 0))
         if (isLatin) {
-            updateBBoxVert(y + bbox["left"], state)
-            updateBBoxVert(y + bbox["right"], state)
+            # Update bounding box based on the rotated positions.
+            # NOT the original h and v.
             updateBBoxHoriz(x + bbox["bottom"], state)
             updateBBoxHoriz(x + bbox["top"], state)
+            updateBBoxVert(y - bbox["left"], state)
+            updateBBoxVert(y - bbox["right"], state)
         } else {
             updateBBoxHoriz(h + bbox["left"], state) ## left
             updateBBoxHoriz(h + bbox["right"], state) ## right
@@ -125,10 +134,12 @@ setChar <- function(raw, put=FALSE, state) {
             updateBBoxVert(v - bbox["top"], state) ## top
         }
         if (!put) {
-            moveBy <- ifelse(isLatin, width, height)
             moveDown(moveBy,  state)
         }
     }
+    # TODO: Clean up once done.
+    # print(bbox)
+    # print(c(x =x , y = y, h = h, v = v, xx = xx, yy = yy))
     addGlyph(glyph, state)
 }
 
@@ -292,8 +303,7 @@ op_right <- function(op, state) {
         moveRight(b, state)
     } else {
         vSpace(b, state)
-        # Don't need to move down on a right shift.
-        # moveDown(b, state)
+        moveDown(b, state)
     }
 }
 
