@@ -108,7 +108,7 @@ setChar <- function(raw, put=FALSE, state) {
         height <- TeXglyphHeight(id, font$file, font$size, fontLib, state)
         isLatin <- font$scriptType == SCRIPT_TYPE_LATIN
         moveBy <- ifelse(isLatin, width, height)
-        x <- ifelse(isLatin, h + font$size / 2, h)
+        x <- ifelse(isLatin, h + height / 2, h)
         xx <- hh
         if (isLatin) {
             inkCentre <- -((bbox["left"] + bbox["right"]) / 2)
@@ -120,18 +120,17 @@ setChar <- function(raw, put=FALSE, state) {
         yy <- vv
         glyph <- glyph(x, y, xx, yy, id, f, font$size, colour=colour[1],
             rotation = ifelse(isLatin, rotation_radians, 0))
+        # Update bounding box based on the rotated positions.
         if (isLatin) {
-            # Update bounding box based on the rotated positions.
-            # NOT the original h and v.
             updateBBoxHoriz(x + bbox["bottom"], state)
             updateBBoxHoriz(x + bbox["top"], state)
             updateBBoxVert(y - bbox["left"], state)
             updateBBoxVert(y - bbox["right"], state)
         } else {
-            updateBBoxHoriz(h + bbox["left"], state) ## left
-            updateBBoxHoriz(h + bbox["right"], state) ## right
-            updateBBoxVert(v - bbox["bottom"], state) ## bottom
-            updateBBoxVert(v - bbox["top"], state) ## top
+            updateBBoxHoriz(x + bbox["left"], state)
+            updateBBoxHoriz(x + bbox["right"], state)
+            updateBBoxVert(y - bbox["bottom"], state)
+            updateBBoxVert(y - bbox["top"], state)
         }
         if (!put) {
             moveDown(moveBy,  state)
