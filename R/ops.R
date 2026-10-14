@@ -85,8 +85,8 @@ setChar <- function(raw, put=FALSE, state) {
     engine <- TeXget("engine", state)
     id <- engine$glyphIndex(raw, font$file, fontLib, dir)
     bbox <- TeXglyphBounds(id, font$file, font$size, fontLib, state)
-    width <- TeXglyphWidth(id, font$file, font$size, fontLib, state)
     if (dir == 0) {
+        width <- TeXglyphWidth(id, font$file, font$size, fontLib, state)
         ## Position glyph then move
         x <- h
         y <- v
@@ -105,18 +105,19 @@ setChar <- function(raw, put=FALSE, state) {
         updateTextRight(h + width[1], state)
     } else {
         # TODO: Glyph height will be undefined for other font libraries.
-        height <- TeXglyphHeight(id, font$file, font$size, fontLib, state)
+        # Glyph origins are available only (and also needed only) for
+        # vertical typesetting.
+        widthOrigX <- TeXglyphWidth(id, font$file, font$size, fontLib, state)
+        width <- widthOrigX[1]
+        origX <- widthOrigX[2]
+        heightOrigY <- TeXglyphHeight(id, font$file, font$size, fontLib, state)
+        height <- -heightOrigY[1]
+        origY <- heightOrigY[2]
         isLatin <- font$scriptType == SCRIPT_TYPE_LATIN
         moveBy <- ifelse(isLatin, width, height)
-        x <- ifelse(isLatin, h + height / 2, h)
+        x <- ifelse(isLatin, h, h - origX)
         xx <- hh
-        if (isLatin) {
-            inkCentre <- -((bbox["left"] + bbox["right"]) / 2)
-        } else {
-            inkCentre <- (bbox["bottom"] + bbox["top"]) / 2
-        } 
-        advanceCentre <- v + moveBy / 2
-        y <- advanceCentre + inkCentre
+        y <- ifelse(isLatin, v, v + origY)
         yy <- vv
         glyph <- glyph(x, y, xx, yy, id, f, font$size, colour=colour[1],
             rotation = ifelse(isLatin, rotation_radians, 0))
@@ -138,7 +139,7 @@ setChar <- function(raw, put=FALSE, state) {
     }
     # TODO: Clean up once done.
     # print(bbox)
-    # print(c(x =x , y = y, h = h, v = v, xx = xx, yy = yy))
+    # print(c(id = id, height = height, width = width, x =x , y = y, h = h, v = v))
     addGlyph(glyph, state)
 }
 
