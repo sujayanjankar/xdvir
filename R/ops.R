@@ -467,15 +467,14 @@ op_font_def <- function(op, state) {
         fontname <- paste(blockValue(op$blocks$op.opparams.fontname.name),
                           collapse="")
         fontfile <- engine$fontFile(fontname)
-        scriptType <- match.arg(
-            fontLib$resolveScriptType(fontname),
-            SUPPORTED_SCRIPT_TYPES
-        )
-        if (is.null(scriptType)) {
-            stop(
-                "Only these script types are supported: ",
-                paste(SUPPORTED_SCRIPT_TYPES, collapse = ", ")
+        if (!is.null(fontLib$resolveScriptType)) {
+            scriptType <- match.arg(
+                fontLib$resolveScriptType(fontname),
+                SUPPORTED_SCRIPT_TYPES
             )
+        } else {
+            # FontLib does not specify a function to determine the script type.
+            scriptType <- SCRIPT_TYPE_LATIN
         }
         s <- blockValue(op$blocks$op.opparams.s)
         d <- blockValue(op$blocks$op.opparams.d)
