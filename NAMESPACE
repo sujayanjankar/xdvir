@@ -36,8 +36,10 @@ export("readDVI",
 
        "TeXstatus",
 
-       "TeXengine",
-       
+       "TeXengine", "registerEngine",
+
+       "SCRIPT_TYPE_CJK", "SCRIPT_TYPE_LATIN", "SUPPORTED_SCRIPT_TYPES",
+
        "LaTeXpackage", "registerPackage",
        "fontspecPackage", "xcolorPackage", "previewPackage",
        "tikzPackage", "tikzPicture",
@@ -46,7 +48,9 @@ export("readDVI",
        
        "grid.dvi", "dviGrob",
 
-       "grid.latex", "latexGrob", 
+       "grid.latex", "latexGrob",
+
+       "commentString", "FontLibrary",
 
        "grid.lualatex", "lualatexGrob",
        "grid.xelatex", "xelatexGrob",

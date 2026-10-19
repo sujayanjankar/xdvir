@@ -26,7 +26,8 @@ latexGrob(tex,
           texFile=NULL,
           name=NULL,
           gp=gpar(),
-          vp=NULL) 
+          vp=NULL,
+          documentClass=NULL) 
 grid.latex(\dots)
 
 xelatexGrob(tex, \dots)
@@ -66,6 +67,8 @@ grid.lualatex(\dots)
   \item{texFile}{Name of a file to use for LaTeX code.}
   \item{harfbuzz}{Logical indicating whether to use the
     \code{"luahbtex"} engine (instead of the \code{"luatex"} engine).}
+  \item{documentClass}{Optional \LaTeX document class to use
+    in the authoring. Defaults to \code{standalone}}
   \item{\dots}{
     Arguments passed to \code{\link{dviGrob}}.
   }

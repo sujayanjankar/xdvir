@@ -41,7 +41,7 @@ addRuleObj <- function(a, b, aa, bb, state) {
         ruleObj <- list(x=TeXget("h", state), y=TeXget("v", state),
                         w=b, h=a,
                         xx=TeXget("hh", state), yy=TeXget("vv", state),
-                        ww=bb, hh=aa)
+                        ww=bb, hh=aa, dir=TeXget("dir", state))
         class(ruleObj) <- "XDVIRruleObj"
         addDVIobj(ruleObj, state)
     } 

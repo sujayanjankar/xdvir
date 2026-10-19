@@ -17,7 +17,10 @@ TeXengine(name,
           glyphIndex,
           options=NULL,
           preamble="",
-          dviSuffix=".dvi")
+          dviSuffix=".dvi",
+          emulation=TRUE,
+          buildArgs=NULL,
+          fontPreset=NULL)
 registerEngine(engine)
 }
 \arguments{

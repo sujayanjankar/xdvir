@@ -49,7 +49,12 @@ FTglyphIndex <- function(code, fontName) {
     .Call(C_glyphIndex, as.integer(code), as.character(fontName)[1])
 }
 
+FTresolveScriptType <- function(fontName) {
+    SCRIPT_TYPE_LATIN
+}
+
 FTfontLibrary <- FontLibrary(glyphWidth=FTglyphWidth,
                              glyphHeight=NULL,
                              glyphBounds=FTglyphBounds,
-                             glyphIndex=FTglyphIndex)
+                             glyphIndex=FTglyphIndex,
+                             resolveScriptType=FTresolveScriptType)

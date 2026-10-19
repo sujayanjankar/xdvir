@@ -15,7 +15,9 @@ element_latex(family=NULL,
               packages=NULL,
               engine=getOption("xdvir.engine"),
               rotate_margins=FALSE,
-              inherit.blank=FALSE)
+              inherit.blank=FALSE,
+              documentClass=NULL,
+              fontLib=getOption("xdvir.fontLib"))
 }
 \arguments{
   \item{family}{The default font family.}
