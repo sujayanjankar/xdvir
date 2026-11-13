@@ -229,7 +229,7 @@ op_push <- function(op, state) {
     i <- TeXget("i", state)
     stack <- TeXget("stack", state)
     stack[[i + 1]] <- TeXmget(c("h", "v", "w", "x", "y", "z",
-                                "hh", "vv"),
+                                "hh", "vv", "dir"),
                               state)
     TeXset("i", i + 1, state)
     TeXset("stack", stack, state)
