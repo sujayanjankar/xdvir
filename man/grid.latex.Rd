@@ -20,14 +20,14 @@ latexGrob(tex,
           width=NA,
           dpi=NA,
           page=1,
+          documentClass="standalone", 
           packages=NULL,
           engine=getOption("xdvir.engine"),
           fontLib=getOption("xdvir.fontLib"),
           texFile=NULL,
           name=NULL,
           gp=gpar(),
-          vp=NULL,
-          documentClass=NULL) 
+          vp=NULL)
 grid.latex(\dots)
 
 xelatexGrob(tex, \dots)
@@ -53,6 +53,8 @@ grid.lualatex(\dots)
     \code{tex}.}
   \item{dpi}{Resolution (dots per inch) for rendering.}
   \item{page}{Which page should be drawn.}
+  \item{documentClass}{Optional \LaTeX document class to use
+    in the authoring. Defaults to \code{"standalone"}}
   \item{packages}{The LaTeX packages to be used.
     May be the name of a LaTeX package (character) or a
     \code{"LaTeXpackage"} object.}
@@ -67,8 +69,6 @@ grid.lualatex(\dots)
   \item{texFile}{Name of a file to use for LaTeX code.}
   \item{harfbuzz}{Logical indicating whether to use the
     \code{"luahbtex"} engine (instead of the \code{"luatex"} engine).}
-  \item{documentClass}{Optional \LaTeX document class to use
-    in the authoring. Defaults to \code{standalone}}
   \item{\dots}{
     Arguments passed to \code{\link{dviGrob}}.
   }

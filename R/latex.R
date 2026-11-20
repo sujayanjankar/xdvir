@@ -43,7 +43,8 @@ buildDVI <- function(tex, width, packages, engine, texFile, documentClass="stand
 makeContent.LaTeXgrob <- function(x, ...) {
     tex <- buildTeX(x$tex, x$gpar, x$engine)
     packages <- c(x$packages, attr(tex, "packages"))
-    dvi <- buildDVI(tex, x$width, packages, x$engine, x$texFile, x$documentClass)
+    dvi <- buildDVI(tex, x$width, packages, x$engine, x$texFile,
+                    x$documentClass)
     setChildren(x,
                 gList(dviGrob(dvi,
                               x=x$x, y=x$y, margin=x$margin, rot=x$rot,
@@ -58,7 +59,8 @@ makeContent.LaTeXgrob <- function(x, ...) {
 xDetails.LaTeXgrob <- function(x, theta) {
     tex <- buildTeX(x$tex, x$gpar, x$engine)
     packages <- c(x$packages, attr(tex, "packages"))
-    dvi <- buildDVI(tex, x$width, packages, x$engine, x$texFile, x$documentClass)
+    dvi <- buildDVI(tex, x$width, packages, x$engine, x$texFile, 
+                    x$documentClass)
     xDetails(dviGrob(dvi,
                      x=x$x, y=x$y, margin=x$margin, rot=x$rot,
                      hjust=x$hjust, vjust=x$vjust,
@@ -102,7 +104,8 @@ widthDetails.LaTeXgrob <- function(x) {
 heightDetails.LaTeXgrob <- function(x) {
     tex <- buildTeX(x$tex, x$gpar, x$engine)
     packages <- c(x$packages, attr(tex, "packages"))
-    dvi <- buildDVI(tex, x$width, packages, x$engine, x$texFile, x$documentClass)
+    dvi <- buildDVI(tex, x$width, packages, x$engine, x$texFile, 
+                    x$documentClass)
     heightDetails(dviGrob(dvi,
                           x=x$x, y=x$y, margin=x$margin, rot=x$rot,
                           hjust=x$hjust, vjust=x$vjust,
@@ -125,14 +128,14 @@ latexGrob <- function(tex,
                       width=NA,
                       dpi=NA,
                       page=1,
+                      documentClass="standalone",
                       packages=NULL,
                       engine=getOption("xdvir.engine"),
                       fontLib=getOption("xdvir.fontLib"),
                       texFile=NULL,
                       name=NULL,
                       gp=gpar(),
-                      vp=NULL,
-                      documentClass=NULL) {
+                      vp=NULL) {
     if (length(tex) < 1)
         stop("No LaTeX fragment to render")
     if (!is.unit(x))

@@ -20,11 +20,8 @@ latex_grob <- function(label, x, y, hjust, vjust,
     ## the calculation of widths and heights etc will be a LOT more efficient.
     child <- latexGrob(tex, x, y, hjust=hjust, vjust=vjust, rot=angle,
                        margin=latexMargin, width=width,
-                       packages=packages,
-                       engine=engine,
-                       gp=NULL,
-                       documentClass=documentClass,
-                       fontLib=fontLib)
+                       documentClass=documentClass, packages=packages,
+                       engine=engine, fontLib=fontLib, gp=NULL)
     if (rotMargins) {
         vp <- NULL
     } else {
@@ -68,12 +65,12 @@ element_latex <- function(family=NULL,
                           color=NULL,
                           margin=NULL,
                           width=NULL,
+                          documentClass="standalone",
                           packages=NULL,
                           engine=getOption("xdvir.engine"),
+                          fontLib=getOption("xdvir.fontLib"),
                           rotate_margins=FALSE,
-                          inherit.blank=FALSE,
-                          documentClass=NULL,
-                          fontLib=getOption("xdvir.fontLib")) {
+                          inherit.blank=FALSE) {
     if (!is.null(color))
         colour <- color
     n <- max(length(family),
@@ -93,12 +90,12 @@ element_latex <- function(family=NULL,
                    angle=angle, 
                    margin=margin,
                    width=width,
+                   documentClass=documentClass,
                    packages=packages,
                    engine=engine,
+                   fontLib=fontLib,
                    rotate_margins=rotate_margins,
-                   inherit.blank=inherit.blank,
-                   documentClass=documentClass,
-                   fontLib=fontLib),
+                   inherit.blank=inherit.blank),
               class=c("element_latex", "element_text", "element"))
 }
 

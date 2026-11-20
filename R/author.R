@@ -211,6 +211,10 @@ DocumentClass <- function(className="standalone", options=NULL) {
     className
 }
 
-as.DocumentClass <- function(d) {
-    switch(class(d), DocumentClass=d, character=documentClass(d))
+as.DocumentClass <- function(className) {
+    switch(
+        class(className),
+        DocumentClass=className,
+        character=DocumentClass(className)
+    )
 }

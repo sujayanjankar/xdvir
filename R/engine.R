@@ -12,9 +12,9 @@ TeXengine <- function(name,
                       options=NULL,
                       preamble="",
                       dviSuffix=".dvi",
-                      emulation = TRUE,
-                      buildArgs = NULL,
-                      fontPreset = NULL) {
+                      emulation=TRUE,
+                      buildArgs=NULL,
+                      fontPreset=NULL) {
     engine <- list(name=name,
                    version=version,
                    command=command,

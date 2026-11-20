@@ -50,7 +50,7 @@ latex <- function(file, dir, engine, packages, dviFile, sig=TRUE) {
         stop(paste0("The ", engine$name,
                     " engine does not support typesetting"))
     }
-    if(!is.null(engine$buildArgs)) {
+    if (!is.null(engine$buildArgs)) {
         # Used in upLaTeX
         options <- engine$buildArgs(buildSignature(engine, packages), dir)
     } else {
@@ -77,7 +77,7 @@ latex <- function(file, dir, engine, packages, dviFile, sig=TRUE) {
         latexmk(file,
             engine=engine$command,
             engine_args=options,
-            emulation = engine$emulation)
+            emulation=engine$emulation)
     } else {
         ## Have to run within try() because tinytex::latexmk() will only
         ## produce .dvi without error if engine="latex" (hard coded)

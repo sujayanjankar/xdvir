@@ -4,7 +4,8 @@
 
 \section{Changes in version 0.3-0}{
   \itemize{
-    \item Add support for vertical typesetting. Additional compatibility for {upxdvir}.
+    \item Add support for vertical typesetting. Additional compatibility for 
+        the \code{{upxdvir}} package.
   }
 }
 
