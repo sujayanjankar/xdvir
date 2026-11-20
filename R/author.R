@@ -117,7 +117,7 @@ author <- function(tex,
                    width=NA,
                    engine=getOption("xdvir.engine"),
                    packages=NULL,
-                   documentClass=NULL) {
+                   documentClass="standalone") {
     if (!is.character(tex))
         stop("'tex' should be a character value containing a LaTeX fragment")
     if (length(tex) < 1)
@@ -129,12 +129,17 @@ author <- function(tex,
         warning("Only using first width")
         width <- width[1]
     }
-    if (is.na(width)) {
-        varwidth <- "varwidth"
+    if (documentClass == "standalone") {
+        if (is.na(width)) {
+            varwidth <- "varwidth"
+        } else {
+            varwidth <- paste0("varwidth=",
+                            as.numeric(width),
+                            "in")
+        }
+        d <- DocumentClass(documentClass, varwidth)
     } else {
-        varwidth <- paste0("varwidth=",
-                           as.numeric(width),
-                           "in")
+        d <- as.DocumentClass(documentClass)
     }
     engine <- getEngine(engine)
     pkgs <- resolvePackages(packages)
@@ -145,11 +150,7 @@ author <- function(tex,
     }
     texDoc <- c(## Record engine used for authoring
                 comment(engine, pkgNames),
-                paste0(
-                    "\\documentclass[", varwidth, "]{",
-                    ifelse(length(documentClass) > 0, documentClass, "standalone"),
-                    "}"
-                ),
+                paste0("\\documentclass[", attr(d, "options"), "]{", d, "}"),
                 engine$preamble,
                 packagePreamble(pkgs),
                 "\\begin{document}",
@@ -202,4 +203,14 @@ authorPackages.LaTeXdocument <- function(tex) {
 
 print.LaTeXdocument <- function(x, ...) {
     cat(as.character(x), sep="\n")
+}
+
+DocumentClass <- function(className="standalone", options=NULL) {
+    attr(className, "options") <- paste0(options, collapse=",")
+    class(className) <- "DocumentClass"
+    className
+}
+
+as.DocumentClass <- function(d) {
+    switch(class(d), DocumentClass=d, character=documentClass(d))
 }

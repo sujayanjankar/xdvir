@@ -45,6 +45,8 @@ export("readDVI",
        "tikzPackage", "tikzPicture",
 
        "author", "typeset", "render",
+
+       "DocumentClass", "as.DocumentClass",
        
        "grid.dvi", "dviGrob",
 
