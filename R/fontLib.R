@@ -1,3 +1,7 @@
+## Script types
+ScriptTypeCJK <- "CJK"
+ScriptTypeLatin <- "LATIN"
+SupportedScriptTypes <- c(ScriptTypeCJK, ScriptTypeLatin)
 
 ## Create a "font library", which is a list of functions for
 ## querying fonts and glyphs

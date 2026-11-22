@@ -50,7 +50,7 @@ FTglyphIndex <- function(code, fontName) {
 }
 
 FTresolveScriptType <- function(fontName) {
-    SCRIPT_TYPE_LATIN
+    ScriptTypeLatin
 }
 
 FTfontLibrary <- FontLibrary(glyphWidth=FTglyphWidth,

@@ -5,11 +5,6 @@ op_ignore <- function(op, state) { }
 rotation_degrees <- -90
 rotation_radians <- rotation_degrees * (pi / 180)
 
-## Script types
-SCRIPT_TYPE_CJK <- "CJK"
-SCRIPT_TYPE_LATIN <- "LATIN"
-SUPPORTED_SCRIPT_TYPES <- c(SCRIPT_TYPE_CJK, SCRIPT_TYPE_LATIN)
-
 ## Glyph index from raw bytes
 glyphIndex <- function(raw, filename, fontLib) {
     nbytes <- length(raw)
@@ -113,7 +108,7 @@ setChar <- function(raw, put=FALSE, state) {
         heightOrigY <- TeXglyphHeight(id, font$file, font$size, fontLib, state)
         height <- -heightOrigY[1]
         origY <- heightOrigY[2]
-        isLatin <- font$scriptType == SCRIPT_TYPE_LATIN
+        isLatin <- font$scriptType == ScriptTypeLatin
         moveBy <- ifelse(isLatin, width, height)
         x <- ifelse(isLatin, h, h - origX)
         xx <- hh
@@ -470,11 +465,11 @@ op_font_def <- function(op, state) {
         if (!is.null(fontLib$resolveScriptType)) {
             scriptType <- match.arg(
                 fontLib$resolveScriptType(fontname),
-                SUPPORTED_SCRIPT_TYPES
+                SupportedScriptTypes
             )
         } else {
             # FontLib does not specify a function to determine the script type.
-            scriptType <- SCRIPT_TYPE_LATIN
+            scriptType <- ScriptTypeLatin
         }
         s <- blockValue(op$blocks$op.opparams.s)
         d <- blockValue(op$blocks$op.opparams.d)

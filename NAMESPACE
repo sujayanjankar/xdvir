@@ -38,7 +38,7 @@ export("readDVI",
 
        "TeXengine", "registerEngine",
 
-       "SCRIPT_TYPE_CJK", "SCRIPT_TYPE_LATIN", "SUPPORTED_SCRIPT_TYPES",
+       "ScriptTypeCJK", "ScriptTypeLatin", "SupportedScriptTypes",
 
        "LaTeXpackage", "registerPackage",
        "fontspecPackage", "xcolorPackage", "previewPackage",
