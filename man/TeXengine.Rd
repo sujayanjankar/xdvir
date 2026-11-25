@@ -73,7 +73,7 @@ registerEngine(engine)
   \code{\link{LaTeXpackage}}.
 }
 \seealso{
-    \link{\code{FontLibrary}}
+    \code{\link{FontLibrary}}
 }
 \value{
   \code{TeXengine()} returns a \code{"TeXengine"} object.

@@ -29,6 +29,10 @@
 \seealso{
   \code{\link{author}}.
 }
+\usage{
+  DocumentClass(className="standalone", options=NULL)
+  as.DocumentClass(className)  
+}
 \examples{
   DocumentClass(className="standalone", options=c("varwidth"))
   as.DocumentClass(className="standalone")
