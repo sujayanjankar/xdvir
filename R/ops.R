@@ -99,7 +99,6 @@ setChar <- function(raw, put=FALSE, state) {
         updateTextLeft(h, state)
         updateTextRight(h + width[1], state)
     } else {
-        # TODO: Glyph height will be undefined for other font libraries.
         # Glyph origins are available only (and also needed only) for
         # vertical typesetting.
         widthOrigX <- TeXglyphWidth(id, font$file, font$size, fontLib, state)
@@ -132,9 +131,6 @@ setChar <- function(raw, put=FALSE, state) {
             moveDown(moveBy,  state)
         }
     }
-    # TODO: Clean up once done.
-    # print(bbox)
-    # print(c(id = id, height = height, width = width, x =x , y = y, h = h, v = v))
     addGlyph(glyph, state)
 }
 

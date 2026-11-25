@@ -35,9 +35,10 @@ registerEngine(engine)
   \item{fontFile}{A function with one argument, a font description from
     a font definition opertaion in DVI output,
     that returns a path to the appropriate font file.}
-  \item{glyphIndex}{A function with one argument, a raw vector of bytes
-    from a set char operation in DVI output,
-    that returns an integer index of the appropriate glyph.}
+  \item{glyphIndex}{A function with four arguments, a raw vector of bytes
+    from a set char operation in DVI output, the font name, the 
+    \code{FontLibrary} to query the font, and the typesetting direction.
+    It returns an integer index of the appropriate glyph.}
   \item{options}{Any required options to \code{command} to ensure that
     the engine generates DVI output.}
   \item{preamble}{A preamble that is added during authoring of a complete
@@ -70,6 +71,9 @@ registerEngine(engine)
   \code{packages} attribute of the character vector of the TeX fragment 
   must contain all the \code{LaTeXpackage} objects required. See 
   \code{\link{LaTeXpackage}}.
+}
+\seealso{
+    \link{\code{FontLibrary}}
 }
 \value{
   \code{TeXengine()} returns a \code{"TeXengine"} object.
