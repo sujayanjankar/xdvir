@@ -3,14 +3,16 @@
 
 latex_grob <- function(label, x, y, hjust, vjust, 
                        angle, family, fontface, colour, size, lineheight,
-                       margin, width, packages, engine, rotMargins) {
+                       margin, width, packages, engine, rotMargins,
+                       documentClass, fontLib) {
     if (rotMargins) {
         ## ggplot2 margin is tlbr;  grid.latex() margin is bltr
         latexMargin <- margin[c(3, 4, 1, 2)]
     } else {
         latexMargin <- 0
     }
-    prefix <- preset(family, fontface, size, lineheight, colour)
+    buildPreset <- getEngine(engine)$fontPreset %||% preset
+    prefix <- buildPreset(family, fontface, size, lineheight, colour)
     tex <- paste(prefix, label, "\n", sep="")
     ## Force in "preview" package
     packages <- unique(c(packages, "preview", attr(prefix, "packages")))
@@ -18,9 +20,8 @@ latex_grob <- function(label, x, y, hjust, vjust,
     ## the calculation of widths and heights etc will be a LOT more efficient.
     child <- latexGrob(tex, x, y, hjust=hjust, vjust=vjust, rot=angle,
                        margin=latexMargin, width=width,
-                       packages=packages,
-                       engine=engine,
-                       gp=NULL)
+                       documentClass=documentClass, packages=packages,
+                       engine=engine, fontLib=fontLib, gp=NULL)
     if (rotMargins) {
         vp <- NULL
     } else {
@@ -32,7 +33,7 @@ latex_grob <- function(label, x, y, hjust, vjust,
     gTree(children=gList(child),
           vp=vp,
           ## Record these for width/heightDetails (x/yDetails not required)
-          margin=margin, rotMargins=rotMargins,
+          margin=margin, rotMargins=rotMargins, documentClass=documentClass,
           cl="latex_grob")
 }
 
@@ -64,8 +65,10 @@ element_latex <- function(family=NULL,
                           color=NULL,
                           margin=NULL,
                           width=NULL,
+                          documentClass="standalone",
                           packages=NULL,
                           engine=getOption("xdvir.engine"),
+                          fontLib=getOption("xdvir.fontLib"),
                           rotate_margins=FALSE,
                           inherit.blank=FALSE) {
     if (!is.null(color))
@@ -87,8 +90,10 @@ element_latex <- function(family=NULL,
                    angle=angle, 
                    margin=margin,
                    width=width,
+                   documentClass=documentClass,
                    packages=packages,
                    engine=engine,
+                   fontLib=fontLib,
                    rotate_margins=rotate_margins,
                    inherit.blank=inherit.blank),
               class=c("element_latex", "element_text", "element"))
@@ -109,7 +114,6 @@ element_grob.element_latex <- function(element,
                                        width=NULL,
                                        margin_x=FALSE, margin_y=FALSE,
                                        packages=NULL,
-                                       engine=getOption("xdvir.engine"),
                                        ...) {
     if (is.null(label))
         return(ggplot2::zeroGrob())
@@ -158,6 +162,9 @@ element_grob.element_latex <- function(element,
 
     packages <- packages %||% element$packages %||% NULL
 
+    engine <- element$engine
+    documentClass <- element$documentClass
+    fontLib <- element$fontLib
     latex_grob(label,
                x=x, y=y,
                hjust=hjust, vjust=vjust,
@@ -171,7 +178,9 @@ element_grob.element_latex <- function(element,
                width=width,
                packages=packages,
                engine=engine,
-               rotMargins=element$rotate_margins)
+               rotMargins=element$rotate_margins,
+               documentClass=documentClass,
+               fontLib=fontLib)
 }
 
 on_load({

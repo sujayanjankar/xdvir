@@ -2,6 +2,8 @@
 ## Functions for sweeping through operations within DVI file
 
 op_ignore <- function(op, state) { }
+rotation_degrees <- -90
+rotation_radians <- rotation_degrees * (pi / 180)
 
 ## Glyph index from raw bytes
 glyphIndex <- function(raw, filename, fontLib) {
@@ -76,7 +78,7 @@ setChar <- function(raw, put=FALSE, state) {
     ## Lots of things depend on text direction
     dir <- TeXget("dir", state)
     engine <- TeXget("engine", state)
-    id <- engine$glyphIndex(raw, font$file, fontLib)
+    id <- engine$glyphIndex(raw, font$file, fontLib, dir)
     bbox <- TeXglyphBounds(id, font$file, font$size, fontLib, state)
     if (dir == 0) {
         width <- TeXglyphWidth(id, font$file, font$size, fontLib, state)
@@ -97,24 +99,37 @@ setChar <- function(raw, put=FALSE, state) {
         updateTextLeft(h, state)
         updateTextRight(h + width[1], state)
     } else {
-        height <- TeXglyphHeight(id, font$file, font$size, fontLib, state)
-        ## Position glyph then move
-        x <- h
+        # Glyph origins are available only (and also needed only) for
+        # vertical typesetting.
+        widthOrigX <- TeXglyphWidth(id, font$file, font$size, fontLib, state)
+        width <- widthOrigX[1]
+        origX <- widthOrigX[2]
+        heightOrigY <- TeXglyphHeight(id, font$file, font$size, fontLib, state)
+        height <- -heightOrigY[1]
+        origY <- heightOrigY[2]
+        isLatin <- font$scriptType == ScriptTypeLatin
+        moveBy <- ifelse(isLatin, width, height)
+        x <- ifelse(isLatin, h, h - origX)
         xx <- hh
-        ## y origin is v + bbox[4] (ymax) + height[2] (tsb)
-        y <- v + bbox[4] + height[2]
-        yy <- vv + round(TeX2px(bbox[4] + height[2], state))
-        glyph <- glyph(x, y, xx, yy, id, f, font$size, colour=colour[1])
-        updateBBoxHoriz(h + bbox[1], state) ## left
-        updateBBoxHoriz(h + bbox[3], state) ## right
-        updateBBoxVert(v + bbox[2], state) ## bottom
-        updateBBoxVert(v + bbox[4] + height[2], state) ## top
-        if (!put) {
-            TeXset("vv", vv + round(TeX2px(height[1], state)), state)
-            moveDown(height[1], state)
+        y <- ifelse(isLatin, v, v + origY)
+        yy <- vv
+        glyph <- glyph(x, y, xx, yy, id, f, font$size, colour=colour[1],
+            rotation = ifelse(isLatin, rotation_radians, 0))
+        # Update bounding box based on the rotated positions.
+        if (isLatin) {
+            updateBBoxHoriz(x + bbox["bottom"], state)
+            updateBBoxHoriz(x + bbox["top"], state)
+            updateBBoxVert(y - bbox["left"], state)
+            updateBBoxVert(y - bbox["right"], state)
+        } else {
+            updateBBoxHoriz(x + bbox["left"], state)
+            updateBBoxHoriz(x + bbox["right"], state)
+            updateBBoxVert(y - bbox["bottom"], state)
+            updateBBoxVert(y - bbox["top"], state)
         }
-        updateTextLeft(h, state)
-        updateTextRight(h + bbox[2], state)
+        if (!put) {
+            moveDown(moveBy,  state)
+        }
     }
     addGlyph(glyph, state)
 }
@@ -205,7 +220,7 @@ op_push <- function(op, state) {
     i <- TeXget("i", state)
     stack <- TeXget("stack", state)
     stack[[i + 1]] <- TeXmget(c("h", "v", "w", "x", "y", "z",
-                                "hh", "vv"),
+                                "hh", "vv", "dir"),
                               state)
     TeXset("i", i + 1, state)
     TeXset("stack", stack, state)
@@ -443,6 +458,15 @@ op_font_def <- function(op, state) {
         fontname <- paste(blockValue(op$blocks$op.opparams.fontname.name),
                           collapse="")
         fontfile <- engine$fontFile(fontname)
+        if (!is.null(fontLib$resolveScriptType)) {
+            scriptType <- match.arg(
+                fontLib$resolveScriptType(fontname),
+                SupportedScriptTypes
+            )
+        } else {
+            # FontLib does not specify a function to determine the script type.
+            scriptType <- ScriptTypeLatin
+        }
         s <- blockValue(op$blocks$op.opparams.s)
         d <- blockValue(op$blocks$op.opparams.d)
         mag <- TeXget("mag", state)
@@ -451,7 +475,8 @@ op_font_def <- function(op, state) {
                                  size=s*(mag/1000),
                                  variations=attr(fontfile, "variations"),
                                  ## For pixel adjustments
-                                 fontSpace=s %/% 6, 
+                                 fontSpace=s %/% 6,
+                                 scriptType=scriptType,
                                  op=op)
         TeXset("fonts", fonts, state)
     }

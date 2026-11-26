@@ -2,7 +2,7 @@
 ## Different decoding of glyphs and font names for
 ## HarfBuzz renderer with LuaTeX
 
-hbGlyphIndex <- function(raw, fontname, fontLib) {
+hbGlyphIndex <- function(raw, fontname, fontLib, direction) {
     ## raw is UNICODE
     ## OR glyph index if non-unicode char
     nbytes <- length(raw)

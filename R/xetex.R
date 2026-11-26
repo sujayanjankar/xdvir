@@ -29,7 +29,7 @@ isXeTeX <- function(dvi) {
     grepl(xetexVersion(), commentStr)
 }
 
-xeGlyphIndex <- function(raw, fontname, fontLib) {
+xeGlyphIndex <- function(raw, fontname, fontLib, direction) {
     glyphIndex(raw, fontname, fontLib)
 }
 

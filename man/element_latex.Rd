@@ -12,8 +12,10 @@ element_latex(family=NULL,
               color=NULL,
               margin=NULL,
               width=NULL,
+              documentClass="standalone",
               packages=NULL,
               engine=getOption("xdvir.engine"),
+              fontLib=getOption("xdvir.fontLib"),
               rotate_margins=FALSE,
               inherit.blank=FALSE)
 }
@@ -23,21 +25,25 @@ element_latex(family=NULL,
   \item{colour, color}{The default text colour.}
   \item{size}{The deafult font size.}
   \item{hjust}{Horizontal justification.  Typically in \eqn{[0, 1]}, but
-    see Details.)}
+    see Details.}
   \item{vjust}{Vertical justification.  Typically in \eqn{[0, 1]}, but
-    see Details.)}
+    see Details.}
   \item{angle}{Angle (in \eqn{[0, 360]})}
   \item{lineheight}{The deafult lineheight.}
   \item{margin}{The margin around the text.}
   \item{width}{Either \code{NA} or a numeric value or a unit
     specifying the width for typesetting.  \code{NA} means the natural width of
     the label.}
+  \item{documentClass}{Optional \LaTeX document class to use
+    in the authoring. Defaults to \code{"standalone"}}
   \item{packages}{The LaTeX packages to be used.
     May be the name of a LaTeX package (character) or a
     \code{"LaTeXpackage"} object.}
   \item{engine}{The TeX engine that should be used to render the LaTeX.
     May be the name of a TeX engine (character)
     or a \code{"TeXengine"} object.}
+  \item{fontLib}{The font libraary the should be used to query fonts
+    and glyphs.}
   \item{rotate_margins}{Whether margins should follow the orientation of
     the text.}
   \item{inherit.blank}{Should this element inherit the existence of an

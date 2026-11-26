@@ -133,7 +133,8 @@ testIndex <- function(code, file) {
 testLib <- xdvir:::FontLibrary(glyphWidth=testWidth,
                                glyphHeight=NULL,
                                glyphBounds=testBounds,
-                               glyphIndex=testIndex)
+                               glyphIndex=testIndex,
+                               resolveScriptType=NULL)
 
 ## Generate dvitype model answer
 type <- function(dpi, rules=TRUE, ...) {

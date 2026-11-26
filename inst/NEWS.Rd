@@ -2,6 +2,13 @@
 \title{NEWS file for the xdvir package}
 \encoding{UTF-8}
 
+\section{Changes in version 0.3-0}{
+  \itemize{
+    \item Add support for vertical typesetting. Additional compatibility for 
+        the \code{{upxdvir}} package.
+  }
+}
+
 \section{Changes in version 0.2-0}{
   \itemize{
     \item Add support for variable fonts via \code{"luahbtex"} engine.
@@ -15,7 +22,7 @@
     is now only available via new \code{TeXstatus()} function.
 
     \item New \code{?xdvir} overall package help file.
-    
+
     \item New \code{"xdvir-trouble"} vignette for trouble-shooting.
   }
 }

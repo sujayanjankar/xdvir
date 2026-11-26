@@ -10,7 +10,8 @@
 author(tex,
        width=NA,
        engine=getOption("xdvir.engine"),
-       packages=NULL)
+       packages=NULL,
+       documentClass="standalone")
 }
 \arguments{
   \item{tex}{LaTeX code.  See Details.}
@@ -20,6 +21,10 @@ author(tex,
     May be the name of a TeX engine (character)
     or a \code{"TeXengine"} object.}
   \item{packages}{The LaTeX packages to be used.}
+  \item{documentClass}{Optional \LaTeX document class to use
+    in the authoring. Defaults to \code{"standalone"}}. Options to the document
+    class may also be specified. See \code{\link{DocumentClass}} and 
+    \code{\link{as.DocumentClass}}.
 }
 \details{
   \code{author()} can be used to generate a complete LaTeX document
